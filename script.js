@@ -1,9 +1,8 @@
-// API keys for Finnhub and Twelve Data (replace with your actual keys)
-const finnhubAPI = 'd00h83pr01qk939o3nn0d00h83pr01qk939o3nng';  // Replace with your Finnhub API key
-const twelveDataAPI = '927a99953b2a4ced8cb90b89cb8d405c';  // Replace with your Twelve Data API key
-
-// Fetch stock data: current price (Finnhub), historical data (Twelve Data)
+// Fetch stock data from Finnhub and Twelve Data APIs
 async function fetchStockData(symbol) {
+  const finnhubAPI = 'd00h83pr01qk939o3nn0d00h83pr01qk939o3nng';  // Replace with your Finnhub API key
+  const twelveDataAPI = '927a99953b2a4ced8cb90b89cb8d405c';  // Replace with your Twelve Data API key
+
   const finnhubResponse = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${finnhubAPI}`);
   const finnhubData = await finnhubResponse.json();
 
@@ -25,15 +24,12 @@ async function getStockData(event) {
 
   const { finnhubData, twelveData } = await fetchStockData(symbol);
 
-  // Historical data from Twelve Data
   const historicalPrices = twelveData.values.map(entry => parseFloat(entry.close));
   const dates = twelveData.values.map(entry => entry.datetime);
 
-  // Predict future prices based on historical data
   const predictedPrices = predictFuturePrices(historicalPrices);
   const predictedDates = generatePredictedDates(dates);
 
-  // Display the prediction chart (historical + predicted)
   displayPredictionChart(dates, historicalPrices, predictedDates, predictedPrices);
 
   const currentPrice = finnhubData.c;
@@ -56,13 +52,13 @@ async function getStockData(event) {
   `;
 }
 
-// Predict future stock prices (for the next 5 minutes, for example)
+// Predict future stock prices (for the next part of the day)
 function predictFuturePrices(historicalPrices) {
   const predictions = [];
   const lastPrice = historicalPrices[historicalPrices.length - 1];
   const dailyIncreaseRate = 1.02;  // Example: assume 2% daily growth
 
-  for (let i = 0; i < 10; i++) {  // Predict for the next 10 intervals (minutes, hours, etc.)
+  for (let i = 0; i < 6; i++) {  // Predict for the rest of the day
     const predictedPrice = lastPrice * Math.pow(dailyIncreaseRate, i + 1);
     predictions.push(predictedPrice);
   }
@@ -70,28 +66,28 @@ function predictFuturePrices(historicalPrices) {
   return predictions;
 }
 
-// Generate predicted dates for the next 10 intervals
+// Generate predicted dates for the rest of the trading day
 function generatePredictedDates(dates) {
   const lastDate = new Date(dates[dates.length - 1]);
   const predictedDates = [];
 
-  for (let i = 1; i <= 10; i++) {
+  for (let i = 1; i <= 6; i++) {
     const nextDate = new Date(lastDate);
-    nextDate.setMinutes(lastDate.getMinutes() + i * 10);  // Adjust to your time interval (e.g., every 10 minutes)
-    predictedDates.push(nextDate.toLocaleTimeString());  // Format time for better display
+    nextDate.setHours(lastDate.getHours() + i);  // Spread predictions over the day
+    predictedDates.push(nextDate.toLocaleTimeString());
   }
 
   return predictedDates;
 }
 
-// Function to display the prediction chart (historical + predicted)
+// Function to display the prediction chart
 function displayPredictionChart(dates, historicalPrices, predictedDates, predictedPrices) {
   const ctx = document.getElementById('predictionChart').getContext('2d');
 
   const chart = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: [...dates, ...predictedDates],  // Combine historical and predicted dates
+      labels: [...dates, ...predictedDates],
       datasets: [
         {
           label: 'Stock Price (Historical)',
@@ -136,7 +132,7 @@ function generateBuySellSignal(predictedPrice, currentPrice) {
 function getBestTimeToBuy(predictedPrices) {
   const minPrice = Math.min(...predictedPrices);
   const bestDay = predictedPrices.indexOf(minPrice);
-  return `Time ${predictedDates[bestDay]} (Predicted price: $${minPrice.toFixed(2)})`;
+  return `Hour ${bestDay + 1} (Predicted price: $${minPrice.toFixed(2)})`;
 }
 
 // Calculate how many shares the user can buy with their balance
