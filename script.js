@@ -101,7 +101,7 @@ function calculateBuyAmount(balance, currentPrice) {
 
 async function getStockData(event) {
   event.preventDefault();  // Prevent form from submitting
-const bestTimeToBuy = getBestTimeToBuy(predictedPrices, predictedTimes);
+
   const symbol = document.getElementById('stock-symbol').value.toUpperCase();
   if (!symbol) {
     alert("Please enter a stock symbol.");
