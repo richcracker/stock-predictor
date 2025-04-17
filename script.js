@@ -37,7 +37,8 @@ function generatePredictedDates(startTime, numPoints = 6) {
 function displayPredictionChart(dates, prices, predictedTimes = [], predictedPrices = []) {
   const ctx = document.getElementById('predictionChart').getContext('2d');
 
-  if (window.predictionChart) {
+  // Check if predictionChart exists and is a valid Chart object before destroying
+  if (window.predictionChart && window.predictionChart.destroy) {
     window.predictionChart.destroy();
   }
 
@@ -87,6 +88,7 @@ function displayPredictionChart(dates, prices, predictedTimes = [], predictedPri
     }
   });
 }
+
 
 // Signal logic
 function generateBuySellSignal(predictedPrice, currentPrice) {
