@@ -1,8 +1,9 @@
-// Fetch stock data from Finnhub and Twelve Data APIs
-async function fetchStockData(symbol) {
-  const finnhubAPI = 'd00h83pr01qk939o3nn0d00h83pr01qk939o3nng';  // Replace with your Finnhub API key
-  const twelveDataAPI = '927a99953b2a4ced8cb90b89cb8d405c';  // Replace with your Twelve Data API key
+// API keys for Finnhub and Twelve Data (replace with your actual keys)
+const finnhubAPI = 'd00h83pr01qk939o3nn0d00h83pr01qk939o3nng';  // Replace with your Finnhub API key
+const twelveDataAPI = '927a99953b2a4ced8cb90b89cb8d405c';  // Replace with your Twelve Data API key
 
+// Fetch stock data: current price (Finnhub), historical data (Twelve Data)
+async function fetchStockData(symbol) {
   const finnhubResponse = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${finnhubAPI}`);
   const finnhubData = await finnhubResponse.json();
 
@@ -24,12 +25,15 @@ async function getStockData(event) {
 
   const { finnhubData, twelveData } = await fetchStockData(symbol);
 
+  // Historical data from Twelve Data
   const historicalPrices = twelveData.values.map(entry => parseFloat(entry.close));
   const dates = twelveData.values.map(entry => entry.datetime);
 
+  // Predict future prices based on historical data
   const predictedPrices = predictFuturePrices(historicalPrices);
   const predictedDates = generatePredictedDates(dates);
 
+  // Display the prediction chart (historical + predicted)
   displayPredictionChart(dates, historicalPrices, predictedDates, predictedPrices);
 
   const currentPrice = finnhubData.c;
@@ -52,13 +56,13 @@ async function getStockData(event) {
   `;
 }
 
-// Predict future stock prices (for the next 5 days, for example)
+// Predict future stock prices (for the next 5 minutes, for example)
 function predictFuturePrices(historicalPrices) {
   const predictions = [];
   const lastPrice = historicalPrices[historicalPrices.length - 1];
   const dailyIncreaseRate = 1.02;  // Example: assume 2% daily growth
 
-  for (let i = 0; i < 5; i++) {  // Predict for the next 5 days
+  for (let i = 0; i < 10; i++) {  // Predict for the next 10 intervals (minutes, hours, etc.)
     const predictedPrice = lastPrice * Math.pow(dailyIncreaseRate, i + 1);
     predictions.push(predictedPrice);
   }
@@ -66,28 +70,28 @@ function predictFuturePrices(historicalPrices) {
   return predictions;
 }
 
-// Generate predicted dates for the next 5 days
+// Generate predicted dates for the next 10 intervals
 function generatePredictedDates(dates) {
   const lastDate = new Date(dates[dates.length - 1]);
   const predictedDates = [];
 
-  for (let i = 1; i <= 5; i++) {
+  for (let i = 1; i <= 10; i++) {
     const nextDate = new Date(lastDate);
-    nextDate.setDate(lastDate.getDate() + i);
-    predictedDates.push(nextDate.toLocaleDateString());
+    nextDate.setMinutes(lastDate.getMinutes() + i * 10);  // Adjust to your time interval (e.g., every 10 minutes)
+    predictedDates.push(nextDate.toLocaleTimeString());  // Format time for better display
   }
 
   return predictedDates;
 }
 
-// Function to display the prediction chart
+// Function to display the prediction chart (historical + predicted)
 function displayPredictionChart(dates, historicalPrices, predictedDates, predictedPrices) {
   const ctx = document.getElementById('predictionChart').getContext('2d');
 
   const chart = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: [...dates, ...predictedDates],
+      labels: [...dates, ...predictedDates],  // Combine historical and predicted dates
       datasets: [
         {
           label: 'Stock Price (Historical)',
@@ -132,7 +136,7 @@ function generateBuySellSignal(predictedPrice, currentPrice) {
 function getBestTimeToBuy(predictedPrices) {
   const minPrice = Math.min(...predictedPrices);
   const bestDay = predictedPrices.indexOf(minPrice);
-  return `Day ${bestDay + 1} (Predicted price: $${minPrice.toFixed(2)})`;
+  return `Time ${predictedDates[bestDay]} (Predicted price: $${minPrice.toFixed(2)})`;
 }
 
 // Calculate how many shares the user can buy with their balance
