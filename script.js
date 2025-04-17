@@ -20,64 +20,75 @@ async function fetchPredictions(symbol) {
   return data[symbol] || [];
 }
 
-function generatePredictedTimes(dates) {
-  const lastDate = new Date(dates[dates.length - 1]);
+function generatePredictedDates(startTime, numPoints = 6) {
   const predictedTimes = [];
+  const start = new Date(startTime);
 
-  for (let i = 1; i <= 6; i++) {
-    const nextDate = new Date(lastDate);
-    nextDate.setHours(lastDate.getHours() + i);  // Spread predictions over the day
-    predictedTimes.push(nextDate.toLocaleTimeString());
+  for (let i = 1; i <= numPoints; i++) {
+    const next = new Date(start);
+    next.setMinutes(start.getMinutes() + i * 30); // 30-minute intervals
+    predictedTimes.push(next.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true }));
   }
 
   return predictedTimes;
 }
 
+
 // Display the prediction chart
-function displayPredictionChart(times, prices, predictedTimes, predictedPrices) {
+function displayPredictionChart(dates, prices, predictedTimes = [], predictedPrices = []) {
   const ctx = document.getElementById('predictionChart').getContext('2d');
 
-  const chart = new Chart(ctx, {
+  if (window.predictionChart) {
+    window.predictionChart.destroy();
+  }
+
+  const allLabels = [...dates, ...predictedTimes];
+  const allPrices = [...prices, ...Array(predictedTimes.length).fill(null)];
+  const allPredictions = [...Array(dates.length).fill(null), ...predictedPrices];
+
+  window.predictionChart = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: times.concat(predictedTimes),
+      labels: allLabels,
       datasets: [
         {
-          label: 'Stock Price (Historical)',
-          data: prices,
-          fill: false,
+          label: 'Actual Price',
+          data: allPrices,
           borderColor: 'rgba(75, 192, 192, 1)',
-          tension: 0.1,
+          tension: 0.1
         },
         {
-          label: 'Predicted Stock Price',
-          data: predictedPrices,
-          fill: false,
+          label: 'Predicted Price',
+          data: allPredictions,
           borderColor: 'rgba(255, 99, 132, 1)',
-          tension: 0.1,
-        },
-      ],
+          borderDash: [5, 5],
+          tension: 0.3
+        }
+      ]
     },
     options: {
       responsive: true,
       scales: {
         x: {
           ticks: {
-            callback: function (value, index, values) {
-              // Format the time labels to be more readable (AM/PM)
-              return new Date(values[index].label).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            },
-          },
-        },
+            maxRotation: 45,
+            autoSkip: true
+          }
+        }
       },
       plugins: {
         legend: {
-          position: 'top',
+          position: 'top'
         },
-      },
-    },
+        tooltip: {
+          mode: 'index',
+          intersect: false
+        }
+      }
+    }
   });
 }
+
 
 function generateBuySellSignal(predictedPrice, currentPrice) {
   if (predictedPrice > currentPrice * 1.02) {
