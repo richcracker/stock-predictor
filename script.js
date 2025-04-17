@@ -1,22 +1,102 @@
-// Import machine learning functions (like the one trained using Colab, etc.)
-async function fetchPredictions(symbol) {
-  const response = await fetch('https://raw.githubusercontent.com/richcracker/stock-predictor/main/predictions.json');
-  const data = await response.json();
-  return data[symbol] || []; // Assuming predictions are keyed by stock symbol
-}
-
-// Fetch live stock data
+// Fetch stock data from Finnhub and Twelve Data APIs
 async function fetchStockData(symbol) {
-  const finnhubAPI = 'd00h83pr01qk939o3nn0d00h83pr01qk939o3nng';  // Finnhub API key
-  const twelveDataAPI = '927a99953b2a4ced8cb90b89cb8d405c';  // Twelve Data API key
+  const finnhubAPI = 'd00h83pr01qk939o3nn0d00h83pr01qk939o3nng';  // Replace with your Finnhub API key
+  const twelveDataAPI = '927a99953b2a4ced8cb90b89cb8d405c';  // Replace with your Twelve Data API key
 
   const finnhubResponse = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${finnhubAPI}`);
   const finnhubData = await finnhubResponse.json();
 
-  const twelveDataResponse = await fetch(`https://api.twelvedata.com/time_series?symbol=${symbol}&interval=1min&apikey=${twelveDataAPI}`);
+  const twelveDataResponse = await fetch(`https://api.twelvedata.com/time_series?symbol=${symbol}&interval=1day&apikey=${twelveDataAPI}`);
   const twelveData = await twelveDataResponse.json();
 
   return { finnhubData, twelveData };
+}
+
+// Function to fetch predictions (You can replace this with actual ML predictions)
+async function fetchPredictions(symbol) {
+  // Replace with actual machine learning predictions or prediction logic
+  const response = await fetch('https://raw.githubusercontent.com/richcracker/stock-predictor/main/predictions.json');
+  const data = await response.json();
+  return data[symbol] || [];
+}
+
+function generatePredictedTimes(dates) {
+  const lastDate = new Date(dates[dates.length - 1]);
+  const predictedTimes = [];
+
+  for (let i = 1; i <= 6; i++) {
+    const nextDate = new Date(lastDate);
+    nextDate.setHours(lastDate.getHours() + i);  // Spread predictions over the day
+    predictedTimes.push(nextDate.toLocaleTimeString());
+  }
+
+  return predictedTimes;
+}
+
+// Display the prediction chart
+function displayPredictionChart(times, prices, predictedTimes, predictedPrices) {
+  const ctx = document.getElementById('predictionChart').getContext('2d');
+
+  const chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: times.concat(predictedTimes),
+      datasets: [
+        {
+          label: 'Stock Price (Historical)',
+          data: prices,
+          fill: false,
+          borderColor: 'rgba(75, 192, 192, 1)',
+          tension: 0.1,
+        },
+        {
+          label: 'Predicted Stock Price',
+          data: predictedPrices,
+          fill: false,
+          borderColor: 'rgba(255, 99, 132, 1)',
+          tension: 0.1,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      scales: {
+        x: {
+          ticks: {
+            callback: function (value, index, values) {
+              // Format the time labels to be more readable (AM/PM)
+              return new Date(values[index].label).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            },
+          },
+        },
+      },
+      plugins: {
+        legend: {
+          position: 'top',
+        },
+      },
+    },
+  });
+}
+
+function generateBuySellSignal(predictedPrice, currentPrice) {
+  if (predictedPrice > currentPrice * 1.02) {
+    return "BUY";
+  } else if (predictedPrice < currentPrice * 0.98) {
+    return "SELL";
+  } else {
+    return "HOLD";
+  }
+}
+
+function getBestTimeToBuy(predictedPrices) {
+  const minPrice = Math.min(...predictedPrices);
+  const bestTimeIndex = predictedPrices.indexOf(minPrice);
+  return `Predicted best time to buy: ${predictedTimes[bestTimeIndex]} (Price: $${minPrice.toFixed(2)})`;
+}
+
+function calculateBuyAmount(balance, currentPrice) {
+  return Math.floor(balance / currentPrice);
 }
 
 async function getStockData(event) {
@@ -28,17 +108,17 @@ async function getStockData(event) {
     return;
   }
 
-  // Fetch stock data from APIs (Finnhub and Twelve Data)
+  // Fetch initial stock data
   const { finnhubData, twelveData } = await fetchStockData(symbol);
   const prices = twelveData.values.map(entry => parseFloat(entry.close));
   const times = twelveData.values.map(entry => new Date(entry.datetime).toLocaleTimeString());
 
-  // Fetch predictions (using ML model or simple prediction logic)
-  const predictions = await fetchPredictions(symbol);  // Use your ML predictions here
+  // Fetch predictions
+  const predictions = await fetchPredictions(symbol);
   const predictedPrices = predictions;  // Use the actual prediction model's output here
   const predictedTimes = generatePredictedTimes(times);  // Generate future times for predictions
 
-  // Display the updated chart
+  // Display the prediction chart
   displayPredictionChart(times, prices, predictedTimes, predictedPrices);
 
   // Generate buy/sell signal and best time to buy
@@ -62,83 +142,6 @@ async function getStockData(event) {
 
   // Show the prediction results section (which was initially hidden)
   document.getElementById('prediction-results').style.display = 'block';  // Make the results visible
-}
-
-
-// Predict future stock prices using the ML model
-function generatePredictedTimes(times) {
-  const lastTime = new Date(times[times.length - 1]);
-  const predictedTimes = [];
-
-  for (let i = 1; i <= 6; i++) {
-    const nextTime = new Date(lastTime);
-    nextTime.setHours(lastTime.getHours() + i);  // Add hours for predictions
-    predictedTimes.push(nextTime.toLocaleTimeString());
-  }
-
-  return predictedTimes;
-}
-
-function displayPredictionChart(times, prices, predictedTimes, predictedPrices) {
-  const ctx = document.getElementById('predictionChart').getContext('2d');
-
-  const chart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: [...times, ...predictedTimes],
-      datasets: [
-        {
-          label: 'Stock Price (Live)',
-          data: prices,
-          fill: false,
-          borderColor: 'rgba(75, 192, 192, 1)',
-          tension: 0.1
-        },
-        {
-          label: 'Stock Price (Predicted)',
-          data: predictedPrices,
-          fill: false,
-          borderColor: 'rgba(255, 99, 132, 1)',
-          tension: 0.1,
-          borderDash: [5, 5]  // Dashed line for predicted data
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: {
-          position: 'top',
-        },
-      },
-      scales: {
-        x: {
-          ticks: {
-            autoSkip: true,
-            maxTicksLimit: 10,
-          }
-        }
-      }
-    },
-  });
-}
-
-// Generate buy/sell signal based on predictions
-function generateBuySellSignal(predictedPrice, currentPrice) {
-  if (predictedPrice > currentPrice * 1.02) {
-    return "BUY";
-  } else if (predictedPrice < currentPrice * 0.98) {
-    return "SELL";
-  } else {
-    return "HOLD";
-  }
-}
-
-// Suggest best time to buy based on predicted prices
-function getBestTimeToBuy(predictedPrices) {
-  const minPrice = Math.min(...predictedPrices);
-  const bestTime = predictedPrices.indexOf(minPrice);
-  return `Time ${bestTime + 1} (Predicted price: $${minPrice.toFixed(2)})`;
 }
 
 // Event listener for form submission
