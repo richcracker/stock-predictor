@@ -12,29 +12,29 @@
   </header>
 
   <main>
+    <!-- Form Section -->
     <section class="form-container">
       <h2>Enter Stock Symbol</h2>
       <form id="stock-form">
         <input type="text" id="stock-symbol" placeholder="Enter symbol (e.g., AAPL)" required>
         <button type="submit">Get Prediction</button>
       </form>
-      <canvas id="predictionChart"></canvas>
     </section>
 
-    <section id="prediction-results">
-  <h3>Prediction Results</h3>
-  <div id="result">
-    <!-- Results will appear here -->
-  </div>
-  <div id="buySellRecommendation" style="margin-top: 20px;"></div>
-  <div id="buyAmountRecommendation" style="margin-top: 10px;"></div>
-  <canvas id="predictionChart" style="margin-top: 30px;"></canvas>
-</section>
+    <!-- Prediction Results Section (Initially Hidden) -->
+    <section id="prediction-results" style="display: none;">
+      <h3>Prediction Results</h3>
+      <div id="result">
+        <!-- Results will appear here after entering a stock symbol -->
+      </div>
+      <div id="buySellRecommendation" style="margin-top: 20px;"></div>
+      <div id="buyAmountRecommendation" style="margin-top: 10px;"></div>
+    </section>
 
-
+    <!-- Prediction Chart Section -->
     <section id="prediction-chart-container">
       <h3>Stock Price Prediction</h3>
-      <canvas id="predictionChart" width="400" height="200"></canvas>  <!-- Graph -->
+      <canvas id="predictionChart" width="400" height="200"></canvas> <!-- Graph -->
     </section>
   </main>
 
