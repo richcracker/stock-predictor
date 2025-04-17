@@ -20,7 +20,6 @@ async function fetchStockData(symbol) {
   return { finnhubData, twelveData };
 }
 
-// Handle form submission and fetching stock data
 async function getStockData(event) {
   event.preventDefault();  // Prevent form from submitting
 
@@ -31,9 +30,9 @@ async function getStockData(event) {
   }
 
   // Fetch initial stock data
-  const data = await fetchStockData(symbol);
-  const prices = data.twelveData.values.map(entry => parseFloat(entry.close));
-  const dates = data.twelveData.values.map(entry => entry.datetime);
+  const { finnhubData, twelveData } = await fetchStockData(symbol);  // This should be inside the async function
+  const prices = twelveData.values.map(entry => parseFloat(entry.close));
+  const dates = twelveData.values.map(entry => entry.datetime);
 
   // Display chart with live data
   displayPredictionChart(dates, prices);
@@ -48,6 +47,7 @@ async function getStockData(event) {
     displayPredictionChart(updatedDates, updatedPrices);
   }, 30000); // 30 seconds interval
 }
+
 
 // Generate predicted dates for the rest of the trading day (for displaying future price predictions)
 function generatePredictedDates(dates) {
