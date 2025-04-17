@@ -89,7 +89,6 @@ function displayPredictionChart(dates, prices, predictedTimes = [], predictedPri
   });
 }
 
-
 function generateBuySellSignal(predictedPrice, currentPrice) {
   if (predictedPrice > currentPrice * 1.02) {
     return "BUY";
