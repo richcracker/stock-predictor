@@ -97,3 +97,6 @@ footer {
 footer p {
   margin: 20px 0;
 }
+#prediction-results {
+  display: none;
+}
