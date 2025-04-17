@@ -1,15 +1,14 @@
-// Function to fetch predictions from GitHub
-async function fetchPredictions() {
-  // Replace with the raw URL of your predictions.json file in GitHub
+// Import machine learning functions (like the one trained using Colab, etc.)
+async function fetchPredictions(symbol) {
   const response = await fetch('https://raw.githubusercontent.com/richcracker/stock-predictor/main/predictions.json');
   const data = await response.json();
-  return data;
+  return data[symbol] || []; // Assuming predictions are keyed by stock symbol
 }
 
-// Fetch stock data from Finnhub and Twelve Data APIs
+// Fetch live stock data
 async function fetchStockData(symbol) {
-  const finnhubAPI = 'd00h83pr01qk939o3nn0d00h83pr01qk939o3nng';  // Replace with your Finnhub API key
-  const twelveDataAPI = '927a99953b2a4ced8cb90b89cb8d405c';  // Replace with your Twelve Data API key
+  const finnhubAPI = 'd00h83pr01qk939o3nn0d00h83pr01qk939o3nng';  // Finnhub API key
+  const twelveDataAPI = '927a99953b2a4ced8cb90b89cb8d405c';  // Twelve Data API key
 
   const finnhubResponse = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${finnhubAPI}`);
   const finnhubData = await finnhubResponse.json();
@@ -29,55 +28,68 @@ async function getStockData(event) {
     return;
   }
 
-  // Fetch initial stock data
-  const { finnhubData, twelveData } = await fetchStockData(symbol);  // This should be inside the async function
+  // Fetch stock data from APIs
+  const { finnhubData, twelveData } = await fetchStockData(symbol);
   const prices = twelveData.values.map(entry => parseFloat(entry.close));
-  const dates = twelveData.values.map(entry => entry.datetime);
+  const times = twelveData.values.map(entry => new Date(entry.datetime).toLocaleTimeString());
 
-  // Display chart with live data
-  displayPredictionChart(dates, prices);
+  // Get predictions for the stock (Machine Learning model)
+  const predictions = await fetchPredictions(symbol);
+  const predictedPrices = predictions;  // Replace with ML predictions
+  const predictedTimes = generatePredictedTimes(times);  // Generate future times
 
-  // Update every 30 seconds
-  setInterval(async () => {
-    const updatedData = await fetchStockData(symbol);
-    const updatedPrices = updatedData.twelveData.values.map(entry => parseFloat(entry.close));
-    const updatedDates = updatedData.twelveData.values.map(entry => entry.datetime);
-    
-    // Update the chart with the new data
-    displayPredictionChart(updatedDates, updatedPrices);
-  }, 30000); // 30 seconds interval
+  // Display updated chart
+  displayPredictionChart(times, prices, predictedTimes, predictedPrices);
+
+  // Generate buy/sell signal and best time to buy
+  const recommendation = generateBuySellSignal(predictedPrices[0], finnhubData.c);
+  const bestTimeToBuy = getBestTimeToBuy(predictedPrices);
+
+  // Display recommendation and best time to buy
+  document.getElementById('buySellRecommendation').innerHTML = `
+    <p><strong>Recommendation: </strong>${recommendation}</p>
+    <p><strong>Current Price: </strong>$${finnhubData.c}</p>
+    <p><strong>Predicted Price (next): </strong>$${predictedPrices[0].toFixed(2)}</p>
+    <p><strong>Best Time to Buy: </strong>${bestTimeToBuy}</p>
+  `;
 }
 
-
-// Generate predicted dates for the rest of the trading day (for displaying future price predictions)
-function generatePredictedDates(dates) {
-  const lastDate = new Date(dates[dates.length - 1]);
-  const predictedDates = [];
+// Predict future stock prices using the ML model
+function generatePredictedTimes(times) {
+  const lastTime = new Date(times[times.length - 1]);
+  const predictedTimes = [];
 
   for (let i = 1; i <= 6; i++) {
-    const nextDate = new Date(lastDate);
-    nextDate.setMinutes(lastDate.getMinutes() + i * 1);  // Spread predictions over the day
-    predictedDates.push(nextDate.toLocaleTimeString());
+    const nextTime = new Date(lastTime);
+    nextTime.setHours(lastTime.getHours() + i);  // Add hours for predictions
+    predictedTimes.push(nextTime.toLocaleTimeString());
   }
 
-  return predictedDates;
+  return predictedTimes;
 }
 
-// Function to display the chart with stock data
-function displayPredictionChart(dates, prices) {
+function displayPredictionChart(times, prices, predictedTimes, predictedPrices) {
   const ctx = document.getElementById('predictionChart').getContext('2d');
 
   const chart = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: dates,
+      labels: [...times, ...predictedTimes],
       datasets: [
         {
-          label: 'Stock Price (1-Min Interval)',
+          label: 'Stock Price (Live)',
           data: prices,
           fill: false,
           borderColor: 'rgba(75, 192, 192, 1)',
           tension: 0.1
+        },
+        {
+          label: 'Stock Price (Predicted)',
+          data: predictedPrices,
+          fill: false,
+          borderColor: 'rgba(255, 99, 132, 1)',
+          tension: 0.1,
+          borderDash: [5, 5]  // Dashed line for predicted data
         }
       ]
     },
@@ -88,11 +100,19 @@ function displayPredictionChart(dates, prices) {
           position: 'top',
         },
       },
+      scales: {
+        x: {
+          ticks: {
+            autoSkip: true,
+            maxTicksLimit: 10,
+          }
+        }
+      }
     },
   });
 }
 
-// Generate buy/sell signal based on predicted prices
+// Generate buy/sell signal based on predictions
 function generateBuySellSignal(predictedPrice, currentPrice) {
   if (predictedPrice > currentPrice * 1.02) {
     return "BUY";
@@ -103,16 +123,11 @@ function generateBuySellSignal(predictedPrice, currentPrice) {
   }
 }
 
-// Suggest when to buy based on predictions (the best time is when the price is the lowest)
+// Suggest best time to buy based on predicted prices
 function getBestTimeToBuy(predictedPrices) {
   const minPrice = Math.min(...predictedPrices);
-  const bestTimeIndex = predictedPrices.indexOf(minPrice);
-  return `Minute ${bestTimeIndex + 1} (Predicted price: $${minPrice.toFixed(2)})`;
-}
-
-// Calculate how many shares the user can buy with their balance
-function calculateBuyAmount(balance, currentPrice) {
-  return Math.floor(balance / currentPrice);
+  const bestTime = predictedPrices.indexOf(minPrice);
+  return `Time ${bestTime + 1} (Predicted price: $${minPrice.toFixed(2)})`;
 }
 
 // Event listener for form submission
