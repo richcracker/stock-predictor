@@ -21,7 +21,6 @@ async function fetchStockData(symbol) {
   return { finnhubData, twelveData };
 }
 
-// Main function to get stock data, predictions, and update the UI
 async function getStockData(event) {
   event.preventDefault();  // Prevent form from submitting
 
@@ -36,9 +35,14 @@ async function getStockData(event) {
   const historicalPrices = twelveData.values.map(entry => parseFloat(entry.close));
   const dates = twelveData.values.map(entry => entry.datetime);
 
-  const predictedPrices = predictFuturePrices(historicalPrices);
+  // Fetch predictions from the predictions.json file
+  const predictions = await fetchPredictions();
+
+  // Use predictions to enhance your chart or decision logic
+  const predictedPrices = predictions[symbol] || []; // Example: using stock symbol to fetch specific predictions
   const predictedDates = generatePredictedDates(dates);
 
+  // Update the chart with the predictions
   displayPredictionChart(dates, historicalPrices, predictedDates, predictedPrices);
 
   const currentPrice = finnhubData.c;
@@ -59,21 +63,22 @@ async function getStockData(event) {
   document.getElementById('buyAmountRecommendation').innerHTML = `
     <p><strong>Amount to Buy: </strong>${buyAmount} shares at $${currentPrice}</p>
   `;
-}
+//}
+
 
 // Predict future stock prices (for the next part of the day)
-function predictFuturePrices(historicalPrices) {
-  const predictions = [];
-  const lastPrice = historicalPrices[historicalPrices.length - 1];
-  const dailyIncreaseRate = 1.02;  // Example: assume 2% daily growth
+//function predictFuturePrices(historicalPrices) {
+//  const predictions = [];
+//  const lastPrice = historicalPrices[historicalPrices.length - 1];
+//   const dailyIncreaseRate = 1.02;  // Example: assume 2% daily growth
 
-  for (let i = 0; i < 6; i++) {  // Predict for the rest of the day
-    const predictedPrice = lastPrice * Math.pow(dailyIncreaseRate, i + 1);
-    predictions.push(predictedPrice);
-  }
+//  for (let i = 0; i < 6; i++) {  // Predict for the rest of the day
+//    const predictedPrice = lastPrice * Math.pow(dailyIncreaseRate, i + 1);
+//    predictions.push(predictedPrice);
+//  }
 
-  return predictions;
-}
+//  return predictions;
+//}
 
 // Generate predicted dates for the rest of the trading day
 function generatePredictedDates(dates) {
@@ -125,6 +130,7 @@ function displayPredictionChart(dates, historicalPrices, predictedDates, predict
     },
   });
 }
+
 
 // Generate buy/sell signal based on predicted prices
 function generateBuySellSignal(predictedPrice, currentPrice) {
