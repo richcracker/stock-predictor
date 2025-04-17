@@ -90,14 +90,22 @@ function generateBuySellSignal(predictedPrice, currentPrice) {
 }
 
 function getBestTimeToBuy(predictedPrices, predictedTimes) {
-  if (!predictedPrices || !predictedTimes || predictedPrices.length === 0 || predictedTimes.length === 0) {
-    return "Not enough data";
+  if (
+    !Array.isArray(predictedPrices) || predictedPrices.length === 0 ||
+    !Array.isArray(predictedTimes) || predictedTimes.length === 0
+  ) {
+    return "Not enough prediction data available.";
   }
 
   const minPrice = Math.min(...predictedPrices);
   const index = predictedPrices.indexOf(minPrice);
-  const bestTime = predictedTimes[index] || "Unknown Time";
-  return `${bestTime} (Predicted price: $${minPrice.toFixed(2)})`;
+
+  // Make sure the index is valid and there's a matching time
+  if (index >= 0 && predictedTimes[index]) {
+    return `${predictedTimes[index]} (Predicted price: $${minPrice.toFixed(2)})`;
+  } else {
+    return "Best time could not be determined.";
+  }
 }
 
 
