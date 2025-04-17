@@ -28,17 +28,17 @@ async function getStockData(event) {
     return;
   }
 
-  // Fetch stock data from APIs
+  // Fetch stock data from APIs (Finnhub and Twelve Data)
   const { finnhubData, twelveData } = await fetchStockData(symbol);
   const prices = twelveData.values.map(entry => parseFloat(entry.close));
   const times = twelveData.values.map(entry => new Date(entry.datetime).toLocaleTimeString());
 
-  // Get predictions for the stock (Machine Learning model)
-  const predictions = await fetchPredictions(symbol);
-  const predictedPrices = predictions;  // Replace with ML predictions
-  const predictedTimes = generatePredictedTimes(times);  // Generate future times
+  // Fetch predictions (using ML model or simple prediction logic)
+  const predictions = await fetchPredictions(symbol);  // Use your ML predictions here
+  const predictedPrices = predictions;  // Use the actual prediction model's output here
+  const predictedTimes = generatePredictedTimes(times);  // Generate future times for predictions
 
-  // Display updated chart
+  // Display the updated chart
   displayPredictionChart(times, prices, predictedTimes, predictedPrices);
 
   // Generate buy/sell signal and best time to buy
@@ -52,7 +52,18 @@ async function getStockData(event) {
     <p><strong>Predicted Price (next): </strong>$${predictedPrices[0].toFixed(2)}</p>
     <p><strong>Best Time to Buy: </strong>${bestTimeToBuy}</p>
   `;
+
+  // Display amount of stock user can buy based on balance
+  const balance = 10000;  // Example balance
+  const buyAmount = calculateBuyAmount(balance, finnhubData.c);
+  document.getElementById('buyAmountRecommendation').innerHTML = `
+    <p><strong>Amount to Buy: </strong>${buyAmount} shares at $${finnhubData.c}</p>
+  `;
+
+  // Show the prediction results section (which was initially hidden)
+  document.getElementById('prediction-results').style.display = 'block';  // Make the results visible
 }
+
 
 // Predict future stock prices using the ML model
 function generatePredictedTimes(times) {
