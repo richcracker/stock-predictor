@@ -39,7 +39,6 @@ function displayPredictionChart(dates, prices, predictedTimes = [], predictedPri
   const ctx = document.getElementById('predictionChart').getContext('2d');
 
   if (window.predictionChart) {
-    window.predictionChart.destroy();
   }
 
   const allLabels = [...dates, ...predictedTimes];
