@@ -1,7 +1,7 @@
 // Function to fetch predictions from GitHub
 async function fetchPredictions() {
   // Replace with the raw URL of your predictions.json file in GitHub
-  const response = await fetch('https://raw.githubusercontent.com/yourusername/yourrepository/main/predictions.json');
+  const response = await fetch('https://github.com/richcracker/stock-predictor/blob/main/predictions.json');
   const data = await response.json();
   return data;
 }
