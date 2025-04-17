@@ -90,10 +90,16 @@ function generateBuySellSignal(predictedPrice, currentPrice) {
 }
 
 function getBestTimeToBuy(predictedPrices, predictedTimes) {
+  if (!predictedPrices || !predictedTimes || predictedPrices.length === 0 || predictedTimes.length === 0) {
+    return "Not enough data";
+  }
+
   const minPrice = Math.min(...predictedPrices);
-  const bestTimeIndex = predictedPrices.indexOf(minPrice);
-  return `Predicted best time to buy: ${predictedTimes[bestTimeIndex]} (Price: $${minPrice.toFixed(2)})`;
+  const index = predictedPrices.indexOf(minPrice);
+  const bestTime = predictedTimes[index] || "Unknown Time";
+  return `${bestTime} (Predicted price: $${minPrice.toFixed(2)})`;
 }
+
 
 function calculateBuyAmount(balance, currentPrice) {
   return Math.floor(balance / currentPrice);
