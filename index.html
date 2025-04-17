@@ -1,79 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Stock Predictor</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background: #f4f4f4;
-    }
-
-    h1 {
-      text-align: center;
-    }
-
-    form {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    input[type="text"] {
-      padding: 10px;
-      font-size: 16px;
-      width: 200px;
-    }
-
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      margin-left: 10px;
-    }
-
-    #predictionChart {
-      max-width: 100%;
-      height: 400px;
-      margin: auto;
-    }
-
-    #prediction-results {
-      margin-top: 30px;
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      max-width: 700px;
-      margin-left: auto;
-      margin-right: auto;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      display: none;
-    }
-
-    p {
-      font-size: 16px;
-    }
-
-    strong {
-      color: #333;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stock Prediction</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>📈 Stock Predictor</h1>
-  <form id="stock-form">
-    <input type="text" id="stock-symbol" placeholder="Enter stock symbol (e.g. AAPL)" required />
-    <button type="submit">Predict</button>
-  </form>
+  <header>
+    <h1>Stock Market Prediction Engine</h1>
+  </header>
 
-  <canvas id="predictionChart"></canvas>
+  <main>
+    <section class="form-container">
+      <h2>Enter Stock Symbol</h2>
+      <form id="stock-form">
+        <input type="text" id="stock-symbol" placeholder="Enter symbol (e.g., AAPL)" required>
+        <button type="submit">Get Prediction</button>
+      </form>
+    </section>
 
-  <div id="prediction-results">
-    <div id="buySellRecommendation"></div>
-    <div id="buyAmountRecommendation" style="margin-top: 15px;"></div>
-  </div>
+    <section id="prediction-results" style="display: none;">
+      <h3>Prediction Results</h3>
+      <div id="chart-container">
+        <canvas id="predictionChart"></canvas>
+      </div>
+      <div id="buySellRecommendation" style="margin-top: 20px;"></div>
+      <div id="buyAmountRecommendation" style="margin-top: 10px;"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 StockPredictor Logan Hines</p>
+  </footer>
 
   <script src="script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
 </html>
