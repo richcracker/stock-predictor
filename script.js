@@ -30,6 +30,46 @@ async function getStockData(event) {
     return;
   }
 
+  // Fetch data
+  const data = await fetchStockData(symbol);
+  const prices = data.values.map(entry => parseFloat(entry.close));
+  const dates = data.values.map(entry => entry.datetime);
+
+  // Display chart with live data
+  displayPredictionChart(dates, prices);
+
+  // Update every 30 seconds
+  setInterval(async () => {
+    const updatedData = await fetchStockData(symbol);
+    const updatedPrices = updatedData.values.map(entry => parseFloat(entry.close));
+    const updatedDates = updatedData.values.map(entry => entry.datetime);
+    
+    // Update the chart with the new data
+    displayPredictionChart(updatedDates, updatedPrices);
+  }, 30000); // 30 seconds interval
+}
+
+
+  // Fetch data
+  const data = await fetchStockData(symbol);
+  const prices = data.values.map(entry => parseFloat(entry.close));
+  const dates = data.values.map(entry => entry.datetime);
+
+  // Display chart with live data
+  displayPredictionChart(dates, prices);
+
+  // Update every 30 seconds
+  setInterval(async () => {
+    const updatedData = await fetchStockData(symbol);
+    const updatedPrices = updatedData.values.map(entry => parseFloat(entry.close));
+    const updatedDates = updatedData.values.map(entry => entry.datetime);
+    
+    // Update the chart with the new data
+    displayPredictionChart(updatedDates, updatedPrices);
+  }, 30000); // 30 seconds interval
+}
+
+
   const { finnhubData, twelveData } = await fetchStockData(symbol);
 
   const historicalPrices = twelveData.values.map(entry => parseFloat(entry.close));
@@ -94,29 +134,20 @@ function generatePredictedDates(dates) {
   return predictedDates;
 }
 
-// Function to display the prediction chart
-function displayPredictionChart(dates, historicalPrices, predictedDates, predictedPrices) {
+function displayPredictionChart(dates, prices) {
   const ctx = document.getElementById('predictionChart').getContext('2d');
 
   const chart = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: [...dates, ...predictedDates],
+      labels: dates,
       datasets: [
         {
-          label: 'Stock Price (Historical)',
-          data: historicalPrices,
+          label: 'Stock Price (1-Min Interval)',
+          data: prices,
           fill: false,
           borderColor: 'rgba(75, 192, 192, 1)',
           tension: 0.1
-        },
-        {
-          label: 'Stock Price (Predicted)',
-          data: predictedPrices,
-          fill: false,
-          borderColor: 'rgba(255, 99, 132, 1)',
-          tension: 0.1,
-          borderDash: [5, 5]  // Dashed line for predicted data
         }
       ]
     },
@@ -130,6 +161,7 @@ function displayPredictionChart(dates, historicalPrices, predictedDates, predict
     },
   });
 }
+
 
 
 // Generate buy/sell signal based on predicted prices
