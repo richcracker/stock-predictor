@@ -1,3 +1,12 @@
+// Function to fetch predictions from GitHub
+async function fetchPredictions() {
+  // Replace with the raw URL of your predictions.json file in GitHub
+  const response = await fetch('https://raw.githubusercontent.com/yourusername/yourrepository/main/predictions.json');
+  const data = await response.json();
+  return data;
+}
+
+
 // Fetch stock data from Finnhub and Twelve Data APIs
 async function fetchStockData(symbol) {
   const finnhubAPI = 'd00h83pr01qk939o3nn0d00h83pr01qk939o3nng';  // Replace with your Finnhub API key
