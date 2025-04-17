@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stock Prediction</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Stock Market Prediction Engine</h1>
+  </header>
+
+  <main>
+    <section class="form-container">
+      <h2>Enter Stock Symbol</h2>
+      <form id="stock-form">
+        <input type="text" id="stock-symbol" placeholder="Enter symbol (e.g., AAPL)" required>
+        <button type="submit">Get Prediction</button>
+      </form>
+    </section>
+
+    <section id="prediction-results">
+      <h3>Prediction Results</h3>
+      <div id="result">
+        <canvas id="predictionChart" width="400" height="200"></canvas>
+        <div id="buySellRecommendation"></div>
+        <div id="buyAmountRecommendation"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 StockPredictor Logan Hinesp</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
