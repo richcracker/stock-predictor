@@ -143,7 +143,7 @@ async function getStockData(event) {
   document.getElementById('buySellRecommendation').innerHTML = `
     <p><strong>Recommendation: </strong>${recommendation}</p>
     <p><strong>Current Price: </strong>$${finnhubData.c}</p>
-    <p><strong>Predicted Price (next): </strong>$${predictedPrices[0].toFixed(2)}</p>
+   <p><strong>Predicted Price (next): </strong>$${predictedPrices?.[0] ? predictedPrices[0].toFixed(2) : 'N/A'}</p>
     <p><strong>Best Time to Buy: </strong>${bestTimeToBuy}</p>
   `;
 
