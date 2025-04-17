@@ -30,7 +30,7 @@ async function getStockData(event) {
     return;
   }
 
-  // Fetch data
+  // Fetch initial stock data
   const data = await fetchStockData(symbol);
   const prices = data.values.map(entry => parseFloat(entry.close));
   const dates = data.values.map(entry => entry.datetime);
@@ -48,27 +48,6 @@ async function getStockData(event) {
     displayPredictionChart(updatedDates, updatedPrices);
   }, 30000); // 30 seconds interval
 }
-
-
-  // Fetch data
-  const data = await fetchStockData(symbol);
-  const prices = data.values.map(entry => parseFloat(entry.close));
-  const dates = data.values.map(entry => entry.datetime);
-
-  // Display chart with live data
-  displayPredictionChart(dates, prices);
-
-  // Update every 30 seconds
-  setInterval(async () => {
-    const updatedData = await fetchStockData(symbol);
-    const updatedPrices = updatedData.values.map(entry => parseFloat(entry.close));
-    const updatedDates = updatedData.values.map(entry => entry.datetime);
-    
-    // Update the chart with the new data
-    displayPredictionChart(updatedDates, updatedPrices);
-  }, 30000); // 30 seconds interval
-}
-
 
   const { finnhubData, twelveData } = await fetchStockData(symbol);
 
