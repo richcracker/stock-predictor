@@ -141,4 +141,6 @@ function calculateBuyAmount(balance, currentPrice) {
 }
 
 // Event listener for form submission
-document.getElementById('stock-form').addEventListener('submit', getStockData);
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('stock-form').addEventListener('submit', getStockData);
+});
