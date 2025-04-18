@@ -14,7 +14,6 @@ async function fetchStockData(symbol) {
 
 // Function to fetch predictions (You can replace this with actual ML predictions)
 async function fetchPredictions(symbol) {
-  // Replace with actual machine learning predictions or prediction logic
   const response = await fetch('https://raw.githubusercontent.com/richcracker/stock-predictor/main/predictions.json');
   const data = await response.json();
   return data[symbol] || [];
@@ -33,15 +32,13 @@ function generatePredictedDates(startTime, numPoints = 6) {
   return predictedTimes;
 }
 
-
 // Display the prediction chart
-function displayPredictionChart(dates, prices, predictedTimes = [], predictedPrices = []) {
+function displayPredictionChart(dates, prices, predictedTimes = [], predictedPrices = [], fullDay = false) {
   const ctx = document.getElementById('predictionChart').getContext('2d');
 
- if (window.predictionChart && typeof window.predictionChart.destroy === 'function') {
-  window.predictionChart.destroy();
-}
-
+  if (window.predictionChart && typeof window.predictionChart.destroy === 'function') {
+    window.predictionChart.destroy();
+  }
 
   const allLabels = [...dates, ...predictedTimes];
   const allPrices = [...prices, ...Array(predictedTimes.length).fill(null)];
@@ -88,8 +85,13 @@ function displayPredictionChart(dates, prices, predictedTimes = [], predictedPri
       }
     }
   });
+
+  if (fullDay) {
+    document.getElementById('nextDayButton').style.display = 'inline-block';
+  }
 }
 
+// Generate buy/sell signal
 function generateBuySellSignal(predictedPrice, currentPrice) {
   if (predictedPrice > currentPrice * 1.02) {
     return "BUY";
@@ -100,18 +102,15 @@ function generateBuySellSignal(predictedPrice, currentPrice) {
   }
 }
 
+// Get best time to buy based on predictions
 function getBestTimeToBuy(predictedPrices, predictedTimes) {
-  if (
-    !Array.isArray(predictedPrices) || predictedPrices.length === 0 ||
-    !Array.isArray(predictedTimes) || predictedTimes.length === 0
-  ) {
+  if (!Array.isArray(predictedPrices) || predictedPrices.length === 0 || !Array.isArray(predictedTimes) || predictedTimes.length === 0) {
     return "Not enough prediction data available.";
   }
 
   const minPrice = Math.min(...predictedPrices);
   const index = predictedPrices.indexOf(minPrice);
 
-  // Make sure the index is valid and there's a matching time
   if (index >= 0 && predictedTimes[index]) {
     return `${predictedTimes[index]} (Predicted price: $${minPrice.toFixed(2)})`;
   } else {
@@ -119,11 +118,12 @@ function getBestTimeToBuy(predictedPrices, predictedTimes) {
   }
 }
 
-
+// Calculate how much stock user can buy
 function calculateBuyAmount(balance, currentPrice) {
   return Math.floor(balance / currentPrice);
 }
 
+// Get stock data and display
 async function getStockData(event) {
   event.preventDefault();  // Prevent form from submitting
 
@@ -131,12 +131,6 @@ async function getStockData(event) {
   if (!symbol) {
     alert("Please enter a stock symbol.");
     return;
-
-console.log("Predictions:", predictions);
-console.log("Predicted Prices:", predictedPrices);
-console.log("Predicted Times:", predictedTimes);
-
-    
   }
 
   // Fetch initial stock data
@@ -175,7 +169,15 @@ console.log("Predicted Times:", predictedTimes);
   document.getElementById('prediction-results').style.display = 'block';  // Make the results visible
 }
 
+// Switch to the next day’s chart
+function showNextDayChart() {
+  // Logic to switch to the next day’s chart
+  alert('Displaying chart for the next trading day.');
+  // Add code to switch chart data to the next day’s prediction or historical data
+}
+
 // Event listener for form submission
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('stock-form').addEventListener('submit', getStockData);
+  document.getElementById('nextDayButton').addEventListener('click', showNextDayChart);
 });
