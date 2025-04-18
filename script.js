@@ -131,6 +131,12 @@ async function getStockData(event) {
   if (!symbol) {
     alert("Please enter a stock symbol.");
     return;
+
+console.log("Predictions:", predictions);
+console.log("Predicted Prices:", predictedPrices);
+console.log("Predicted Times:", predictedTimes);
+
+    
   }
 
   // Fetch initial stock data
