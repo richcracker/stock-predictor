@@ -38,9 +38,10 @@ function generatePredictedDates(startTime, numPoints = 6) {
 function displayPredictionChart(dates, prices, predictedTimes = [], predictedPrices = []) {
   const ctx = document.getElementById('predictionChart').getContext('2d');
 
-  if (window.predictionChart) {
-    window.predictionChart.destroy();
-  }
+ if (window.predictionChart && typeof window.predictionChart.destroy === 'function') {
+  window.predictionChart.destroy();
+}
+
 
   const allLabels = [...dates, ...predictedTimes];
   const allPrices = [...prices, ...Array(predictedTimes.length).fill(null)];
