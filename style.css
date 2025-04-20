@@ -1,139 +1,229 @@
 /* General Styles */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 body {
   font-family: Arial, sans-serif;
-  background-color: #f4f4f9;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f4;
   color: #333;
-  line-height: 1.6;
 }
 
+/* Header Section */
 header {
   background-color: #333;
-  color: #fff;
+  color: white;
   text-align: center;
-  padding: 20px 0;
+  padding: 20px;
 }
 
 header h1 {
-  font-size: 2.5rem;
+  margin: 0;
+  font-size: 2.5em;
 }
 
+/* Main Content */
 main {
   padding: 20px;
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
-.form-container {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.form-container h2 {
-  margin-bottom: 20px;
-  font-size: 1.8rem;
-  text-align: center;
-}
-
+/* Stock Form */
 #stock-form {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
 }
 
-#stock-symbol {
+#stock-form input,
+#stock-form button {
   padding: 10px;
   font-size: 1rem;
-  margin-right: 10px;
-  width: 200px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
 }
 
-button {
-  padding: 10px 20px;
-  background-color: #333;
-  color: #fff;
+#stock-form input {
+  width: 70%;
+}
+
+#stock-form button {
+  width: 25%;
+  background-color: #4CAF50;
+  color: white;
   border: none;
-  border-radius: 5px;
   cursor: pointer;
 }
 
-button:hover {
-  background-color: #555;
+#stock-form button:hover {
+  background-color: #45a049;
 }
 
-#prediction-results {
-  background-color: #fff;
+/* Prediction Chart */
+#prediction-chart-container {
+  margin-top: 40px;
+}
+
+#predictionChart {
+  width: 100%;
+  height: 400px;
+}
+
+/* Buy/Sell Recommendations */
+#buySellRecommendation,
+#buyAmountRecommendation {
+  margin-top: 20px;
+  font-size: 1.2rem;
+  padding: 10px;
+  background-color: #e0e0e0;
+  border-radius: 5px;
+}
+
+/* Comparison Section */
+#comparison-results {
+  margin-top: 40px;
   padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  margin-top: 30px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
 }
 
-#prediction-results h3 {
-  font-size: 1.8rem;
+#comparison-results h3 {
+  margin-top: 0;
+  font-size: 1.5em;
+}
+
+#comparison-results p {
+  font-size: 1.1em;
+}
+
+/* Stock News Section */
+#news-articles {
+  margin-top: 40px;
+  padding: 20px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.news-article {
   margin-bottom: 20px;
 }
 
-#buySellRecommendation, #buyAmountRecommendation {
-  margin-top: 20px;
-  font-size: 1.2rem;
+.news-article h3 {
+  font-size: 1.2em;
+  color: #2c3e50;
 }
 
-footer {
-  text-align: center;
-  margin-top: 30px;
+.news-article p {
   font-size: 1rem;
-  color: #888;
+  color: #7f8c8d;
 }
 
-footer p {
-  margin: 20px 0;
+.news-article a {
+  text-decoration: none;
+  color: #3498db;
 }
 
-#prediction-results {
-  display: none;
+.news-article a:hover {
+  text-decoration: underline;
 }
 
-/* Dark Mode Styles */
-body.dark-mode {
-  background-color: #2f2f2f;
-  color: #fff;
+/* Toggle Buttons for Dark/Light Mode */
+#toggle-button-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
 }
 
-header.dark-mode {
-  background-color: #222;
+#toggle-button {
+  background-color: #333;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
 }
 
-header h1.dark-mode {
-  color: #fff;
-}
-
-button.dark-mode {
+#toggle-button:hover {
   background-color: #555;
-  color: #fff;
 }
 
-button.dark-mode:hover {
-  background-color: #777;
+/* Additional UI Styling */
+#prediction-results {
+  display: none; /* Initially hidden */
 }
 
-.form-container.dark-mode {
-  background-color: #3a3a3a;
-  color: #fff;
+#nextDayButton {
+  display: none; /* Initially hidden */
+  background-color: #f39c12;
+  padding: 10px 20px;
+  border: none;
+  color: white;
+  cursor: pointer;
+  border-radius: 5px;
 }
 
-#prediction-results.dark-mode {
-  background-color: #3a3a3a;
+#nextDayButton:hover {
+  background-color: #e67e22;
 }
 
-footer.dark-mode {
-  color: #ccc;
+/* Modal or Pop-up (for Stock Comparison) */
+#comparison-modal {
+  display: none;  /* Hidden by default */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+#comparison-modal .modal-content {
+  background-color: white;
+  padding: 30px;
+  width: 80%;
+  max-width: 600px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+#comparison-modal .modal-header {
+  font-size: 1.5em;
+  margin-bottom: 15px;
+}
+
+#comparison-modal .modal-body {
+  font-size: 1.1em;
+}
+
+#comparison-modal .close {
+  color: #aaa;
+  float: right;
+  font-size: 1.5em;
+}
+
+#comparison-modal .close:hover,
+#comparison-modal .close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  #stock-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  #stock-form input,
+  #stock-form button {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  #prediction-chart-container {
+    margin-top: 20px;
+  }
 }
