@@ -1,32 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Stock Prediction</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
     <h1>Stock Market Prediction Engine</h1>
-    <div class="theme-toggle">
-      <label class="switch">
-        <input type="checkbox" id="toggle-theme" />
-        <span class="slider"></span>
-      </label>
-    </div>
+    <!-- Dark/Light Mode Toggle Button -->
+    <button id="theme-toggle">Toggle Dark/Light Mode</button>
   </header>
 
   <main>
     <section class="form-container">
       <h2>Enter Stock Symbol</h2>
       <form id="stock-form">
-        <input type="text" id="stock-symbol" placeholder="e.g., AAPL" required />
-        <select id="timeframe">
-          <option value="1d">1 Day</option>
-          <option value="5d">5 Days</option>
-          <option value="1mo">1 Month</option>
-        </select>
+        <input type="text" id="stock-symbol" placeholder="Enter symbol (e.g., AAPL)" required>
         <button type="submit">Get Prediction</button>
       </form>
     </section>
@@ -38,6 +29,7 @@
       </div>
       <div id="buySellRecommendation" style="margin-top: 20px;"></div>
       <div id="buyAmountRecommendation" style="margin-top: 10px;"></div>
+      <!-- Next Day Button for navigating to the next prediction -->
       <button id="nextDayButton" style="display: none;">Next Day</button>
     </section>
   </main>
@@ -45,7 +37,7 @@
   <footer>
     <p>&copy; 2025 StockPredictor Logan Hines</p>
   </footer>
-
+  
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="script.js"></script>
 </body>
