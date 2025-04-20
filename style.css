@@ -27,10 +27,6 @@ main {
   padding: 20px;
   max-width: 800px;
   margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
 }
 
 .form-container {
@@ -38,8 +34,6 @@ main {
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 400px;
 }
 
 .form-container h2 {
@@ -50,8 +44,7 @@ main {
 
 #stock-form {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: center;
 }
 
 #stock-symbol {
@@ -70,7 +63,6 @@ button {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 1rem;
 }
 
 button:hover {
@@ -82,10 +74,7 @@ button:hover {
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 600px;
   margin-top: 30px;
-  text-align: center;
 }
 
 #prediction-results h3 {
