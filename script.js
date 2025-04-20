@@ -199,3 +199,28 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('stock-form').addEventListener('submit', getStockData);
   document.getElementById('nextDayButton').addEventListener('click', showNextDayChart);
 });
+
+// Function to fetch and display stock news
+async function fetchStockNews(symbol) {
+  const finnhubAPI = 'd00h83pr01qk939o3nn0d00h83pr01qk939o3nng';  // Replace with your Finnhub API key
+  const newsResponse = await fetch(`https://finnhub.io/api/v1/news?category=general&token=${finnhubAPI}`);
+  const newsData = await newsResponse.json();
+
+  const newsList = document.getElementById('news-list');
+  document.getElementById('news-symbol').innerText = symbol;
+
+  // Clear existing news
+  newsList.innerHTML = '';
+
+  // Display the latest news for the stock symbol
+  newsData.forEach(news => {
+    const newsItem = document.createElement('li');
+    newsItem.innerHTML = `
+      <a href="${news.url}" target="_blank">${news.headline}</a>
+      <p>${news.summary}</p>
+      <p><small>Published on: ${new Date(news.datetime * 1000).toLocaleString()}</small></p>
+    `;
+    newsList.appendChild(newsItem);
+  });
+}
+
