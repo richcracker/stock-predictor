@@ -3,20 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Stock Market Prediction Engine</title>
+  <title>Stock Prediction</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
     <h1>Stock Market Prediction Engine</h1>
-
-    <!-- Ticker Symbol Updates -->
-    <section id="ticker-container">
-      <h2>Live Stock Ticker Updates</h2>
-      <ul id="ticker-symbols">
-        <!-- Ticker symbols will be dynamically inserted here -->
-      </ul>
-    </section>
   </header>
 
   <main>
@@ -28,15 +20,6 @@
       </form>
     </section>
 
-    <!-- Stock News Widget -->
-    <section id="stock-news">
-      <h2>Latest Stock News</h2>
-      <div id="news-articles">
-        <!-- News articles will be dynamically inserted here -->
-      </div>
-    </section>
-
-    <!-- Stock Prediction Results -->
     <section id="prediction-results" style="display: none;">
       <h3>Prediction Results</h3>
       <div id="chart-container">
@@ -47,23 +30,12 @@
       <!-- Next Day Button for navigating to the next prediction -->
       <button id="nextDayButton" style="display: none;">Next Day</button>
     </section>
-
-    <!-- Stock Comparison Tool -->
-    <section id="stock-comparison">
-      <h2>Compare Stocks</h2>
-      <form id="comparison-form">
-        <input type="text" id="comparison-symbol1" placeholder="Enter symbol (e.g., AAPL)" required>
-        <input type="text" id="comparison-symbol2" placeholder="Enter symbol (e.g., TSLA)" required>
-        <button type="submit">Compare</button>
-      </form>
-      <div id="comparison-results"></div>
-    </section>
   </main>
 
   <footer>
     <p>&copy; 2025 StockPredictor Logan Hines</p>
   </footer>
-
+  
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="script.js"></script>
 </body>
