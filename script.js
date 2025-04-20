@@ -19,6 +19,51 @@ async function fetchPredictions(symbol) {
   return data[symbol] || [];
 }
 
+// Fetch and display stock news (using Finnhub News API as an example)
+async function fetchStockNews(symbol) {
+  const finnhubAPI = 'd00h83pr01qk939o3nn0d00h83pr01qk939o3nng';  // Replace with your Finnhub API key
+  const response = await fetch(`https://finnhub.io/api/v1/company-news?symbol=${symbol}&from=2025-04-01&to=2025-04-20&token=${finnhubAPI}`);
+  const newsData = await response.json();
+  return newsData;
+}
+
+// Display the stock news articles
+function displayStockNews(newsData) {
+  const newsContainer = document.getElementById('news-articles');
+  newsContainer.innerHTML = '';  // Clear existing articles
+
+  newsData.forEach(news => {
+    const article = document.createElement('div');
+    article.classList.add('news-article');
+    article.innerHTML = `
+      <h3><a href="${news.url}" target="_blank">${news.headline}</a></h3>
+      <p>${news.summary}</p>
+      <p><strong>Source: </strong>${news.source}</p>
+      <p><strong>Published: </strong>${new Date(news.datetime * 1000).toLocaleDateString()}</p>
+    `;
+    newsContainer.appendChild(article);
+  });
+}
+
+// Function to handle stock comparison
+async function compareStocks(symbol1, symbol2) {
+  const { finnhubData: data1, twelveData: twelveData1 } = await fetchStockData(symbol1);
+  const { finnhubData: data2, twelveData: twelveData2 } = await fetchStockData(symbol2);
+
+  const comparisonResults = `
+    <h3>Comparison Results:</h3>
+    <h4>${symbol1} vs ${symbol2}</h4>
+    <p><strong>${symbol1} Current Price:</strong> $${data1.c}</p>
+    <p><strong>${symbol2} Current Price:</strong> $${data2.c}</p>
+    <p><strong>${symbol1} 52-week High:</strong> $${data1.h}</p>
+    <p><strong>${symbol2} 52-week High:</strong> $${data2.h}</p>
+    <p><strong>${symbol1} 52-week Low:</strong> $${data1.l}</p>
+    <p><strong>${symbol2} 52-week Low:</strong> $${data2.l}</p>
+  `;
+  document.getElementById('comparison-results').innerHTML = comparisonResults;
+}
+
+// Generate predicted dates for the prediction chart
 function generatePredictedDates(startTime, numPoints = 6) {
   const predictedTimes = [];
   const start = new Date(startTime);
@@ -91,136 +136,76 @@ function displayPredictionChart(dates, prices, predictedTimes = [], predictedPri
   }
 }
 
-// Generate buy/sell signal
-function generateBuySellSignal(predictedPrice, currentPrice) {
-  if (predictedPrice > currentPrice * 1.02) {
-    return "BUY";
-  } else if (predictedPrice < currentPrice * 0.98) {
-    return "SELL";
-  } else {
-    return "HOLD";
-  }
-}
-
-// Get best time to buy based on predictions
-function getBestTimeToBuy(predictedPrices, predictedTimes) {
-  if (!Array.isArray(predictedPrices) || predictedPrices.length === 0 || !Array.isArray(predictedTimes) || predictedTimes.length === 0) {
-    return "Not enough prediction data available.";
-  }
-
-  const minPrice = Math.min(...predictedPrices);
-  const index = predictedPrices.indexOf(minPrice);
-
-  if (index >= 0 && predictedTimes[index]) {
-    return `${predictedTimes[index]} (Predicted price: $${minPrice.toFixed(2)})`;
-  } else {
-    return "Best time could not be determined.";
-  }
-}
-
-// Calculate how much stock user can buy
-function calculateBuyAmount(balance, currentPrice) {
-  return Math.floor(balance / currentPrice);
-}
-
-// Get stock data and display
-async function getStockData(event) {
-  event.preventDefault();  // Prevent form from submitting
-
-  const symbol = document.getElementById('stock-symbol').value.toUpperCase();
-  if (!symbol) {
-    alert("Please enter a stock symbol.");
-    return;
-  }
-
-  // Fetch initial stock data
-  const { finnhubData, twelveData } = await fetchStockData(symbol);
-  const prices = twelveData.values.map(entry => parseFloat(entry.close));
-  const times = twelveData.values.map(entry => new Date(entry.datetime).toLocaleTimeString());
-
-  // Fetch predictions
-  const predictions = await fetchPredictions(symbol);
-  const predictedPrices = predictions;  // Use the actual prediction model's output here
-  const predictedTimes = generatePredictedDates(times[times.length - 1]);  // Generate future times for predictions
-
-  // Display the prediction chart
-  displayPredictionChart(times, prices, predictedTimes, predictedPrices);
-
-  // Generate buy/sell signal and best time to buy
-  const recommendation = generateBuySellSignal(predictedPrices[0], finnhubData.c);
-  const bestTimeToBuy = getBestTimeToBuy(predictedPrices, predictedTimes);
-
-  // Display recommendation and best time to buy
-  document.getElementById('buySellRecommendation').innerHTML = `
-    <p><strong>Recommendation: </strong>${recommendation}</p>
-    <p><strong>Current Price: </strong>$${finnhubData.c}</p>
-    <p><strong>Predicted Price (next): </strong>$${predictedPrices?.[0] ? predictedPrices[0].toFixed(2) : 'N/A'}</p>
-    <p><strong>Best Time to Buy: </strong>${bestTimeToBuy}</p>
-  `;
-
-  // Display amount of stock user can buy based on balance
-  const balance = 10000;  // Example balance
-  const buyAmount = calculateBuyAmount(balance, finnhubData.c);
-  document.getElementById('buyAmountRecommendation').innerHTML = `
-    <p><strong>Amount to Buy: </strong>${buyAmount} shares at $${finnhubData.c}</p>
-  `;
-
-  // Show the prediction results section (which was initially hidden)
-  document.getElementById('prediction-results').style.display = 'block';  // Make the results visible
-}
-
-// Switch to the next day’s chart
-function showNextDayChart() {
-  // Logic to switch to the next day’s chart
-  alert('Displaying chart for the next trading day.');
-  // Add code to switch chart data to the next day’s prediction or historical data
-}
-
-// Event listener for theme toggle
-function toggleTheme() {
-  const currentTheme = document.body.getAttribute('data-theme');
-  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-  document.body.setAttribute('data-theme', newTheme);
-  localStorage.setItem('theme', newTheme);
-}
-
-// Load saved theme on page load
+// Event listener for form submission
 document.addEventListener('DOMContentLoaded', () => {
-  // Check for saved theme in localStorage
-  const savedTheme = localStorage.getItem('theme');
-  if (savedTheme) {
-    document.body.setAttribute('data-theme', savedTheme);
-  }
+  // Handle stock form submission
+  document.getElementById('stock-form').addEventListener('submit', async (event) => {
+    event.preventDefault();  // Prevent form from submitting
 
-  // Add event listener for theme toggle
-  document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+    const symbol = document.getElementById('stock-symbol').value.toUpperCase();
+    if (!symbol) {
+      alert("Please enter a stock symbol.");
+      return;
+    }
 
-  // Event listener for form submission
-  document.getElementById('stock-form').addEventListener('submit', getStockData);
-  document.getElementById('nextDayButton').addEventListener('click', showNextDayChart);
-});
+    // Fetch initial stock data
+    const { finnhubData, twelveData } = await fetchStockData(symbol);
+    const prices = twelveData.values.map(entry => parseFloat(entry.close));
+    const times = twelveData.values.map(entry => new Date(entry.datetime).toLocaleTimeString());
 
-// Function to fetch and display stock news
-async function fetchStockNews(symbol) {
-  const finnhubAPI = 'd00h83pr01qk939o3nn0d00h83pr01qk939o3nng';  // Replace with your Finnhub API key
-  const newsResponse = await fetch(`https://finnhub.io/api/v1/news?category=general&token=${finnhubAPI}`);
-  const newsData = await newsResponse.json();
+    // Fetch predictions
+    const predictions = await fetchPredictions(symbol);
+    const predictedPrices = predictions;  // Use the actual prediction model's output here
+    const predictedTimes = generatePredictedDates(times[times.length - 1]);  // Generate future times for predictions
 
-  const newsList = document.getElementById('news-list');
-  document.getElementById('news-symbol').innerText = symbol;
+    // Display the prediction chart
+    displayPredictionChart(times, prices, predictedTimes, predictedPrices);
 
-  // Clear existing news
-  newsList.innerHTML = '';
+    // Generate buy/sell signal and best time to buy
+    const recommendation = generateBuySellSignal(predictedPrices[0], finnhubData.c);
+    const bestTimeToBuy = getBestTimeToBuy(predictedPrices, predictedTimes);
 
-  // Display the latest news for the stock symbol
-  newsData.forEach(news => {
-    const newsItem = document.createElement('li');
-    newsItem.innerHTML = `
-      <a href="${news.url}" target="_blank">${news.headline}</a>
-      <p>${news.summary}</p>
-      <p><small>Published on: ${new Date(news.datetime * 1000).toLocaleString()}</small></p>
+    // Display recommendation and best time to buy
+    document.getElementById('buySellRecommendation').innerHTML = `
+      <p><strong>Recommendation: </strong>${recommendation}</p>
+      <p><strong>Current Price: </strong>$${finnhubData.c}</p>
+      <p><strong>Predicted Price (next): </strong>$${predictedPrices?.[0] ? predictedPrices[0].toFixed(2) : 'N/A'}</p>
+      <p><strong>Best Time to Buy: </strong>${bestTimeToBuy}</p>
     `;
-    newsList.appendChild(newsItem);
-  });
-}
 
+    // Display amount of stock user can buy based on balance
+    const balance = 10000;  // Example balance
+    const buyAmount = calculateBuyAmount(balance, finnhubData.c);
+    document.getElementById('buyAmountRecommendation').innerHTML = `
+      <p><strong>Amount to Buy: </strong>${buyAmount} shares at $${finnhubData.c}</p>
+    `;
+
+    // Show the prediction results section (which was initially hidden)
+    document.getElementById('prediction-results').style.display = 'block';  // Make the results visible
+  });
+
+  // Handle stock comparison form submission
+  document.getElementById('comparison-form').addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const symbol1 = document.getElementById('comparison-symbol1').value.toUpperCase();
+    const symbol2 = document.getElementById('comparison-symbol2').value.toUpperCase();
+
+    if (!symbol1 || !symbol2) {
+      alert("Please enter two stock symbols.");
+      return;
+    }
+
+    // Compare the stocks
+    await compareStocks(symbol1, symbol2);
+  });
+
+  // Handle news display when a stock symbol is entered
+  document.getElementById('stock-symbol').addEventListener('input', async (event) => {
+    const symbol = event.target.value.toUpperCase();
+    if (symbol) {
+      const newsData = await fetchStockNews(symbol);
+      displayStockNews(newsData);
+    }
+  });
+});
