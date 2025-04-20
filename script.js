@@ -176,8 +176,26 @@ function showNextDayChart() {
   // Add code to switch chart data to the next day’s prediction or historical data
 }
 
-// Event listener for form submission
+// Event listener for theme toggle
+function toggleTheme() {
+  const currentTheme = document.body.getAttribute('data-theme');
+  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  document.body.setAttribute('data-theme', newTheme);
+  localStorage.setItem('theme', newTheme);
+}
+
+// Load saved theme on page load
 document.addEventListener('DOMContentLoaded', () => {
+  // Check for saved theme in localStorage
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme) {
+    document.body.setAttribute('data-theme', savedTheme);
+  }
+
+  // Add event listener for theme toggle
+  document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+
+  // Event listener for form submission
   document.getElementById('stock-form').addEventListener('submit', getStockData);
   document.getElementById('nextDayButton').addEventListener('click', showNextDayChart);
 });
