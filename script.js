@@ -26,7 +26,6 @@ async function fetchStockData(symbol) {
 
 // Function to fetch predictions (use static data here for now)
 async function fetchPredictions(symbol) {
-  // Static prediction data for testing (you can replace this with actual predictions)
   const predictions = {
     'AAPL': [150.23, 151.56, 152.78, 153.12, 154.23],  // Example for AAPL stock
     'GOOG': [2800.25, 2805.15, 2810.33, 2815.22, 2820.30]  // Example for GOOG stock
@@ -75,100 +74,40 @@ function displayPredictionChart(dates, prices, predictedTimes = [], predictedPri
           label: 'Predicted Price',
           data: allPredictions,
           borderColor: 'rgba(255, 99, 132, 1)',
-          tension: 0.1,
           borderDash: [5, 5],
-          fill: false
+          tension: 0.3
         }
       ]
     },
     options: {
       responsive: true,
-      plugins: {
-        legend: {
-          position: 'top',
-        }
-      },
       scales: {
         x: {
-          title: {
-            display: true,
-            text: 'Time'
+          ticks: {
+            maxRotation: 0,
+            autoSkip: true,
           }
         },
         y: {
-          title: {
-            display: true,
-            text: 'Price ($)'
-          },
-          ticks: {
-            beginAtZero: false
-          }
+          position: 'left',
         }
-      }
-    }
-  });
-}
+      },
+      plugins: {
+        legend: {
+          position: 'top'
+        },
+        tooltip: {
+          mode: 'index',
+          intersect: false
+        },
+        zoom: {
+          pan: {
+            enabled: true,
+            mode: 'xy',
+            speed: 10,
+            threshold: 10
+          },
+          zoom: {
+            wheel: {
+              enabled
 
-// Function to update Buy/Sell recommendation (Static Example)
-function displayRecommendation(symbol) {
-  const recommendation = document.getElementById('buySellRecommendation');
-  const amountRecommendation = document.getElementById('buyAmountRecommendation');
-
-  if (symbol === 'AAPL') {
-    recommendation.innerHTML = '<strong>Recommendation:</strong> Buy!';
-    amountRecommendation.innerHTML = '<strong>Amount to Buy:</strong> $500 worth of AAPL stock';
-  } else if (symbol === 'GOOG') {
-    recommendation.innerHTML = '<strong>Recommendation:</strong> Sell!';
-    amountRecommendation.innerHTML = '<strong>Amount to Sell:</strong> $300 worth of GOOG stock';
-  }
-}
-
-// Handle form submission
-document.getElementById('stock-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const stockSymbol = document.getElementById('stock-symbol').value.toUpperCase();
-  if (!stockSymbol) {
-    alert('Please enter a stock symbol.');
-    return;
-  }
-
-  document.getElementById('loading-spinner').style.display = 'flex';
-  const stockData = await fetchStockData(stockSymbol);
-  const predictions = await fetchPredictions(stockSymbol);
-
-  if (!stockData || predictions.length === 0) {
-    document.getElementById('loading-spinner').style.display = 'none';
-    return;
-  }
-
-  // Example for displaying stock data (e.g., open price from Finnhub API)
-  const openPrice = stockData.finnhubData.o;
-
-  // Generate predictions and display the chart
-  const predictedTimes = generatePredictedDates(stockData.twelveData.meta.timestamp);
-  displayPredictionChart(
-    [new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true })],
-    [openPrice],
-    predictedTimes,
-    predictions
-  );
-
-  // Display buy/sell recommendation
-  displayRecommendation(stockSymbol);
-
-  // Hide loading spinner and show results
-  document.getElementById('loading-spinner').style.display = 'none';
-  document.getElementById('prediction-results').style.display = 'block';
-});
-
-document.getElementById('nextDayButton').addEventListener('click', async () => {
-  const stockSymbol = document.getElementById('stock-symbol').value.toUpperCase();
-  const predictions = await fetchPredictions(stockSymbol);
-
-  if (predictions.length > 0) {
-    displayPredictionChart(
-      generatePredictedDates(new Date().getTime(), 12),
-      predictions
-    );
-  }
-});
