@@ -6,7 +6,7 @@ async function fetchStockData(symbol) {
   const finnhubResponse = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${finnhubAPI}`);
   const finnhubData = await finnhubResponse.json();
 
-  const twelveDataResponse = await fetch(`https://api.twelvedata.com/time_series?symbol=${symbol}&interval=1day&apikey=${twelveDataAPI}`);
+  const twelveDataResponse = await fetch(`https://api.twelvedata.com/time_series?symbol=${symbol}&interval=1min&apikey=${twelveDataAPI}`);
   const twelveData = await twelveDataResponse.json();
 
   return { finnhubData, twelveData };
@@ -32,6 +32,11 @@ function generatePredictedDates(startTime, numPoints = 6) {
   return predictedTimes;
 }
 
+// Format time to display only hour and minute
+function formatTime(date) {
+  return new Date(date).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+}
+
 // Display the prediction chart
 function displayPredictionChart(dates, prices, predictedTimes = [], predictedPrices = [], fullDay = false) {
   const ctx = document.getElementById('predictionChart').getContext('2d');
@@ -53,14 +58,16 @@ function displayPredictionChart(dates, prices, predictedTimes = [], predictedPri
           label: 'Actual Price',
           data: allPrices,
           borderColor: 'rgba(75, 192, 192, 1)',
-          tension: 0.1
+          tension: 0.1,
+          fill: false
         },
         {
           label: 'Predicted Price',
           data: allPredictions,
           borderColor: 'rgba(255, 99, 132, 1)',
           borderDash: [5, 5],
-          tension: 0.3
+          tension: 0.3,
+          fill: false
         }
       ]
     },
@@ -69,8 +76,17 @@ function displayPredictionChart(dates, prices, predictedTimes = [], predictedPri
       scales: {
         x: {
           ticks: {
+            callback: function (value) {
+              // Show time in HH:MM format
+              return formatTime(value);
+            },
             maxRotation: 45,
             autoSkip: true
+          }
+        },
+        y: {
+          ticks: {
+            beginAtZero: false
           }
         }
       },
@@ -80,7 +96,12 @@ function displayPredictionChart(dates, prices, predictedTimes = [], predictedPri
         },
         tooltip: {
           mode: 'index',
-          intersect: false
+          intersect: false,
+          callbacks: {
+            label: function (tooltipItem) {
+              return `$${tooltipItem.raw.toFixed(2)}`;
+            }
+          }
         }
       }
     }
@@ -140,7 +161,7 @@ async function getStockData(event) {
     // Fetch initial stock data
     const { finnhubData, twelveData } = await fetchStockData(symbol);
     const prices = twelveData.values.map(entry => parseFloat(entry.close));
-    const times = twelveData.values.map(entry => new Date(entry.datetime).toLocaleTimeString());
+    const times = twelveData.values.map(entry => new Date(entry.datetime).getTime()); // Times as Unix timestamps for better handling
 
     // Fetch predictions
     const predictions = await fetchPredictions(symbol);
@@ -178,7 +199,6 @@ async function getStockData(event) {
     document.getElementById('loading-spinner').style.display = 'none';
   }
 }
-
 
 // Event listener for form submission
 document.getElementById('stock-form').addEventListener('submit', getStockData);
