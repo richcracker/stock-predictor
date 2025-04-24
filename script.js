@@ -3,20 +3,37 @@ async function fetchStockData(symbol) {
   const finnhubAPI = 'd00h83pr01qk939o3nn0d00h83pr01qk939o3nng';  // Replace with your Finnhub API key
   const twelveDataAPI = '927a99953b2a4ced8cb90b89cb8d405c';  // Replace with your Twelve Data API key
 
-  const finnhubResponse = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${finnhubAPI}`);
-  const finnhubData = await finnhubResponse.json();
+  try {
+    const finnhubResponse = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${finnhubAPI}`);
+    if (!finnhubResponse.ok) {
+      throw new Error('Finnhub API request failed');
+    }
+    const finnhubData = await finnhubResponse.json();
 
-  const twelveDataResponse = await fetch(`https://api.twelvedata.com/time_series?symbol=${symbol}&interval=1min&apikey=${twelveDataAPI}`);
-  const twelveData = await twelveDataResponse.json();
+    const twelveDataResponse = await fetch(`https://api.twelvedata.com/time_series?symbol=${symbol}&interval=1min&apikey=${twelveDataAPI}`);
+    if (!twelveDataResponse.ok) {
+      throw new Error('Twelve Data API request failed');
+    }
+    const twelveData = await twelveDataResponse.json();
 
-  return { finnhubData, twelveData };
+    return { finnhubData, twelveData };
+  } catch (error) {
+    console.error('Error fetching stock data:', error);
+    alert('An error occurred while fetching stock data. Please try again later.');
+    return null;
+  }
 }
 
-// Function to fetch predictions (You can replace this with actual ML predictions)
+// Function to fetch predictions (use static data here for now)
 async function fetchPredictions(symbol) {
-  const response = await fetch('https://raw.githubusercontent.com/richcracker/stock-predictor/main/predictions.json');
-  const data = await response.json();
-  return data[symbol] || [];
+  // Static prediction data for testing (you can replace this with actual predictions)
+  const predictions = {
+    'AAPL': [150.23, 151.56, 152.78, 153.12, 154.23],  // Example for AAPL stock
+    'GOOG': [2800.25, 2805.15, 2810.33, 2815.22, 2820.30]  // Example for GOOG stock
+  };
+
+  // Check if symbol exists in static data, otherwise return an empty array
+  return predictions[symbol] || [];
 }
 
 function generatePredictedDates(startTime, numPoints = 6) {
@@ -30,11 +47,6 @@ function generatePredictedDates(startTime, numPoints = 6) {
   }
 
   return predictedTimes;
-}
-
-// Format time to display only hour and minute
-function formatTime(date) {
-  return new Date(date).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
 }
 
 // Display the prediction chart
@@ -58,16 +70,14 @@ function displayPredictionChart(dates, prices, predictedTimes = [], predictedPri
           label: 'Actual Price',
           data: allPrices,
           borderColor: 'rgba(75, 192, 192, 1)',
-          tension: 0.1,
-          fill: false
+          tension: 0.1
         },
         {
           label: 'Predicted Price',
           data: allPredictions,
           borderColor: 'rgba(255, 99, 132, 1)',
           borderDash: [5, 5],
-          tension: 0.3,
-          fill: false
+          tension: 0.3
         }
       ]
     },
@@ -76,17 +86,8 @@ function displayPredictionChart(dates, prices, predictedTimes = [], predictedPri
       scales: {
         x: {
           ticks: {
-            callback: function (value) {
-              // Show time in HH:MM format
-              return formatTime(value);
-            },
             maxRotation: 45,
             autoSkip: true
-          }
-        },
-        y: {
-          ticks: {
-            beginAtZero: false
           }
         }
       },
@@ -96,12 +97,7 @@ function displayPredictionChart(dates, prices, predictedTimes = [], predictedPri
         },
         tooltip: {
           mode: 'index',
-          intersect: false,
-          callbacks: {
-            label: function (tooltipItem) {
-              return `$${tooltipItem.raw.toFixed(2)}`;
-            }
-          }
+          intersect: false
         }
       }
     }
@@ -160,8 +156,11 @@ async function getStockData(event) {
   try {
     // Fetch initial stock data
     const { finnhubData, twelveData } = await fetchStockData(symbol);
+    if (!finnhubData || !twelveData) {
+      throw new Error('Failed to fetch stock data.');
+    }
     const prices = twelveData.values.map(entry => parseFloat(entry.close));
-    const times = twelveData.values.map(entry => new Date(entry.datetime).getTime()); // Times as Unix timestamps for better handling
+    const times = twelveData.values.map(entry => new Date(entry.datetime).toLocaleTimeString());
 
     // Fetch predictions
     const predictions = await fetchPredictions(symbol);
@@ -194,6 +193,7 @@ async function getStockData(event) {
     document.getElementById('prediction-results').style.display = 'block';  // Make the results visible
   } catch (error) {
     alert("An error occurred while fetching data. Please try again.");
+    console.error(error); // Log the error for debugging
   } finally {
     // Hide the spinner after the data is fetched and processed
     document.getElementById('loading-spinner').style.display = 'none';
