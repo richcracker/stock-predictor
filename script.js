@@ -86,20 +86,6 @@ function displayPredictionChart(dates, prices, predictedTimes = [], predictedPri
       plugins: {
         legend: {
           position: 'top',
-        },
-        zoom: {
-          pan: {
-            enabled: true,
-            mode: 'xy',
-            speed: 10,
-            threshold: 10
-          },
-          zoom: {
-            wheel: {
-              enabled: true,
-              speed: 0.1
-            }
-          }
         }
       },
       scales: {
@@ -182,4 +168,7 @@ document.getElementById('nextDayButton').addEventListener('click', async () => {
   if (predictions.length > 0) {
     displayPredictionChart(
       generatePredictedDates(new Date().getTime(), 12),
-     
+      predictions
+    );
+  }
+});
