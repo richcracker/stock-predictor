@@ -87,11 +87,11 @@ function displayPredictionChart(dates, prices, predictedTimes = [], predictedPri
         x: {
           ticks: {
             maxRotation: 0, // Make sure labels stay horizontal
-            autoSkip: true
+            autoSkip: true,
           }
         },
         y: {
-          position: 'left'
+          position: 'left',
         }
       },
       plugins: {
@@ -105,13 +105,18 @@ function displayPredictionChart(dates, prices, predictedTimes = [], predictedPri
         zoom: {
           pan: {
             enabled: true,
-            mode: 'xy'
+            mode: 'xy',
+            speed: 10,
+            threshold: 10
           },
           zoom: {
             enabled: true,
             mode: 'xy',
             speed: 0.1,
-            sensitivity: 3
+            sensitivity: 3,
+            onZoomComplete: function() {
+              console.log("Zoom completed");
+            }
           }
         }
       }
@@ -217,3 +222,4 @@ async function getStockData(event) {
 
 // Event listener for form submission
 document.getElementById('stock-form').addEventListener('submit', getStockData);
+
