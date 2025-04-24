@@ -62,6 +62,17 @@ function generateFullDayTimes(startTime, endTime, interval = 15) {
   return times;
 }
 
+// Function to generate buy/sell signal based on predicted price
+function generateBuySellSignal(predictedPrice, currentPrice) {
+  if (predictedPrice > currentPrice * 1.02) {
+    return "BUY";
+  } else if (predictedPrice < currentPrice * 0.98) {
+    return "SELL";
+  } else {
+    return "HOLD";
+  }
+}
+
 // Display the prediction chart
 function displayPredictionChart(dates, prices, predictedTimes = [], predictedPrices = [], fullDay = false) {
   const ctx = document.getElementById('predictionChart').getContext('2d');
@@ -120,38 +131,6 @@ function displayPredictionChart(dates, prices, predictedTimes = [], predictedPri
   if (fullDay) {
     document.getElementById('nextDayButton').style.display = 'inline-block';
   }
-}
-
-// Generate buy/sell signal
-function generateBuySellSignal(predictedPrice, currentPrice) {
-  if (predictedPrice > currentPrice * 1.02) {
-    return "BUY";
-  } else if (predictedPrice < currentPrice * 0.98) {
-    return "SELL";
-  } else {
-    return "HOLD";
-  }
-}
-
-// Get best time to buy based on predictions
-function getBestTimeToBuy(predictedPrices, predictedTimes) {
-  if (!Array.isArray(predictedPrices) || predictedPrices.length === 0 || !Array.isArray(predictedTimes) || predictedTimes.length === 0) {
-    return "Not enough prediction data available.";
-  }
-
-  const minPrice = Math.min(...predictedPrices);
-  const index = predictedPrices.indexOf(minPrice);
-
-  if (index >= 0 && predictedTimes[index]) {
-    return `${predictedTimes[index]} (Predicted price: $${minPrice.toFixed(2)})`;
-  } else {
-    return "Best time could not be determined.";
-  }
-}
-
-// Calculate how much stock user can buy
-function calculateBuyAmount(balance, currentPrice) {
-  return Math.floor(balance / currentPrice);
 }
 
 // Get stock data and display
