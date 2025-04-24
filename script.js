@@ -99,21 +99,6 @@ function displayPredictionChart(dates, prices, predictedTimes = [], predictedPri
         tooltip: {
           mode: 'index',
           intersect: false
-        },
-        zoom: {
-          pan: {
-            enabled: true,
-            mode: 'xy',
-            speed: 10,
-            threshold: 10
-          },
-          zoom: {
-            wheel: {
-              enabled: true,
-              speed: 0.1,
-              sensitivity: 1
-            }
-          }
         }
       }
     }
