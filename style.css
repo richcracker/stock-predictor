@@ -114,13 +114,18 @@ footer p {
   background-color: #555;
 }
 
-#predictionChart {
-  margin-top: 20px;
+#chart-container {
+  position: relative;
   width: 100%;
   max-width: 100%;
+  margin-top: 20px;
 }
 
-/* Spinner Styles */
+canvas {
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+}
+
 #loading-spinner {
   display: flex;
   flex-direction: column;
@@ -154,61 +159,4 @@ footer p {
   color: #fff;
   margin-top: 10px;
   font-size: 1.2rem;
-}
-
-/* Chart and Zoom Styles */
-#chart-container {
-  position: relative;
-  width: 100%;
-  max-width: 1200px;
-  margin: auto;
-}
-
-canvas {
-  border: 1px solid #ccc;
-  background-color: #f9f9f9;
-}
-
-#chart-container {
-  position: relative;
-  width: 100%;
-  max-width: 1200px;
-  margin: auto;
-}
-
-/* Add custom styles for the chart zoom controls (if applicable) */
-.chart-legend {
-  display: flex;
-  justify-content: flex-start;
-  margin: 10px 0;
-}
-
-.chart-legend div {
-  margin-right: 20px;
-  display: flex;
-  align-items: center;
-}
-
-.chart-legend span {
-  margin-left: 5px;
-}
-
-/* Add space for the zoom controls (e.g., plus and minus buttons) */
-.zoom-controls {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-.zoom-controls button {
-  padding: 10px 15px;
-  background-color: #333;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.zoom-controls button:hover {
-  background-color: #555;
 }
