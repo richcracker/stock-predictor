@@ -1,15 +1,19 @@
 // Fetch stock data from Finnhub and Twelve Data APIs
 async function fetchStockData(symbol) {
-  const finnhubAPI = 'd00h83pr01qk939o3nn0d00h83pr01qk939o3nng';
-  const twelveDataAPI = '927a99953b2a4ced8cb90b89cb8d405c';
+  const finnhubAPI = 'd00h83pr01qk939o3nn0d00h83pr01qk939o3nng';  // Replace with your Finnhub API key
+  const twelveDataAPI = '927a99953b2a4ced8cb90b89cb8d405c';  // Replace with your Twelve Data API key
 
   try {
     const finnhubResponse = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${finnhubAPI}`);
-    if (!finnhubResponse.ok) throw new Error('Finnhub API request failed');
+    if (!finnhubResponse.ok) {
+      throw new Error('Finnhub API request failed');
+    }
     const finnhubData = await finnhubResponse.json();
 
-    const twelveDataResponse = await fetch(`https://api.twelvedata.com/time_series?symbol=${symbol}&interval=1min&outputsize=390&extended_hours=true&apikey=${twelveDataAPI}`);
-    if (!twelveDataResponse.ok) throw new Error('Twelve Data API request failed');
+    const twelveDataResponse = await fetch(`https://api.twelvedata.com/time_series?symbol=${symbol}&interval=1min&apikey=${twelveDataAPI}`);
+    if (!twelveDataResponse.ok) {
+      throw new Error('Twelve Data API request failed');
+    }
     const twelveData = await twelveDataResponse.json();
 
     return { finnhubData, twelveData };
@@ -20,11 +24,15 @@ async function fetchStockData(symbol) {
   }
 }
 
+// Function to fetch predictions (use static data here for now)
 async function fetchPredictions(symbol) {
+  // Static prediction data for testing (you can replace this with actual predictions)
   const predictions = {
-    'AAPL': [150.23, 151.56, 152.78, 153.12, 154.23],
-    'GOOG': [2800.25, 2805.15, 2810.33, 2815.22, 2820.30]
+    'AAPL': [150.23, 151.56, 152.78, 153.12, 154.23],  // Example for AAPL stock
+    'GOOG': [2800.25, 2805.15, 2810.33, 2815.22, 2820.30]  // Example for GOOG stock
   };
+
+  // Check if symbol exists in static data, otherwise return an empty array
   return predictions[symbol] || [];
 }
 
@@ -34,15 +42,17 @@ function generatePredictedDates(startTime, numPoints = 6) {
 
   for (let i = 1; i <= numPoints; i++) {
     const next = new Date(start);
-    next.setMinutes(start.getMinutes() + i * 30);
-    predictedTimes.push(next.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+    next.setMinutes(start.getMinutes() + i * 30); // 30-minute intervals
+    predictedTimes.push(next.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true }));
   }
 
   return predictedTimes;
 }
 
+// Display the prediction chart
 function displayPredictionChart(dates, prices, predictedTimes = [], predictedPrices = [], fullDay = false) {
   const ctx = document.getElementById('predictionChart').getContext('2d');
+
   if (window.predictionChart && typeof window.predictionChart.destroy === 'function') {
     window.predictionChart.destroy();
   }
@@ -76,8 +86,7 @@ function displayPredictionChart(dates, prices, predictedTimes = [], predictedPri
       scales: {
         x: {
           ticks: {
-            maxRotation: 0,
-            minRotation: 0,
+            maxRotation: 0, // Make sure labels stay horizontal
             autoSkip: true
           }
         },
@@ -96,21 +105,17 @@ function displayPredictionChart(dates, prices, predictedTimes = [], predictedPri
         zoom: {
           pan: {
             enabled: true,
-            mode: 'x'
+            mode: 'xy'
           },
           zoom: {
-            pinch: {
-              enabled: true
-            },
-            wheel: {
-              enabled: true
-            },
-            mode: 'x'
+            enabled: true,
+            mode: 'xy',
+            speed: 0.1,
+            sensitivity: 3
           }
         }
       }
-    },
-    plugins: [Chart.registry.getPlugin('zoom')]
+    }
   });
 
   if (fullDay) {
@@ -118,6 +123,7 @@ function displayPredictionChart(dates, prices, predictedTimes = [], predictedPri
   }
 }
 
+// Generate buy/sell signal
 function generateBuySellSignal(predictedPrice, currentPrice) {
   if (predictedPrice > currentPrice * 1.02) {
     return "BUY";
@@ -128,6 +134,7 @@ function generateBuySellSignal(predictedPrice, currentPrice) {
   }
 }
 
+// Get best time to buy based on predictions
 function getBestTimeToBuy(predictedPrices, predictedTimes) {
   if (!Array.isArray(predictedPrices) || predictedPrices.length === 0 || !Array.isArray(predictedTimes) || predictedTimes.length === 0) {
     return "Not enough prediction data available.";
@@ -143,12 +150,14 @@ function getBestTimeToBuy(predictedPrices, predictedTimes) {
   }
 }
 
+// Calculate how much stock user can buy
 function calculateBuyAmount(balance, currentPrice) {
   return Math.floor(balance / currentPrice);
 }
 
+// Get stock data and display
 async function getStockData(event) {
-  event.preventDefault();
+  event.preventDefault();  // Prevent form from submitting
 
   const symbol = document.getElementById('stock-symbol').value.toUpperCase();
   if (!symbol) {
@@ -156,25 +165,31 @@ async function getStockData(event) {
     return;
   }
 
+  // Show the spinner
   document.getElementById('loading-spinner').style.display = 'flex';
 
   try {
+    // Fetch initial stock data
     const { finnhubData, twelveData } = await fetchStockData(symbol);
-    if (!finnhubData || !twelveData || !twelveData.values) throw new Error('Failed to fetch stock data.');
+    if (!finnhubData || !twelveData) {
+      throw new Error('Failed to fetch stock data.');
+    }
+    const prices = twelveData.values.map(entry => parseFloat(entry.close));
+    const times = twelveData.values.map(entry => new Date(entry.datetime).toLocaleTimeString());
 
-    const sortedValues = twelveData.values.reverse(); // Make sure it's left-to-right
-    const prices = sortedValues.map(entry => parseFloat(entry.close));
-    const times = sortedValues.map(entry => new Date(entry.datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-
+    // Fetch predictions
     const predictions = await fetchPredictions(symbol);
-    const predictedPrices = predictions;
-    const predictedTimes = generatePredictedDates(times[times.length - 1]);
+    const predictedPrices = predictions;  // Use the actual prediction model's output here
+    const predictedTimes = generatePredictedDates(times[times.length - 1]);  // Generate future times for predictions
 
-    displayPredictionChart(times, prices, predictedTimes, predictedPrices, true);
+    // Display the prediction chart
+    displayPredictionChart(times, prices, predictedTimes, predictedPrices);
 
+    // Generate buy/sell signal and best time to buy
     const recommendation = generateBuySellSignal(predictedPrices[0], finnhubData.c);
     const bestTimeToBuy = getBestTimeToBuy(predictedPrices, predictedTimes);
 
+    // Display recommendation and best time to buy
     document.getElementById('buySellRecommendation').innerHTML = `
       <p><strong>Recommendation: </strong>${recommendation}</p>
       <p><strong>Current Price: </strong>$${finnhubData.c}</p>
@@ -182,19 +197,23 @@ async function getStockData(event) {
       <p><strong>Best Time to Buy: </strong>${bestTimeToBuy}</p>
     `;
 
-    const balance = 10000;
+    // Display amount of stock user can buy based on balance
+    const balance = 10000;  // Example balance
     const buyAmount = calculateBuyAmount(balance, finnhubData.c);
     document.getElementById('buyAmountRecommendation').innerHTML = `
       <p><strong>Amount to Buy: </strong>${buyAmount} shares at $${finnhubData.c}</p>
     `;
 
-    document.getElementById('prediction-results').style.display = 'block';
+    // Show the prediction results section (which was initially hidden)
+    document.getElementById('prediction-results').style.display = 'block';  // Make the results visible
   } catch (error) {
     alert("An error occurred while fetching data. Please try again.");
-    console.error(error);
+    console.error(error); // Log the error for debugging
   } finally {
+    // Hide the spinner after the data is fetched and processed
     document.getElementById('loading-spinner').style.display = 'none';
   }
 }
 
+// Event listener for form submission
 document.getElementById('stock-form').addEventListener('submit', getStockData);
