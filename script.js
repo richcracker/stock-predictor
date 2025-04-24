@@ -1,22 +1,15 @@
-// API Keys
-const API_KEY_FINNHUB = 'd00h83pr01qk939o3nn0d00h83pr01qk939o3nng';  // Insert your Finnhub API key here
-const API_KEY_TWELVE_DATA = '927a99953b2a4ced8cb90b89cb8d405c';  // Insert your Twelve Data API key here
-
 // Fetch stock data from Finnhub and Twelve Data APIs
 async function fetchStockData(symbol) {
+  const finnhubAPI = 'd00h83pr01qk939o3nn0d00h83pr01qk939o3nng';  // Replace with your Finnhub API key
+  const twelveDataAPI = '927a99953b2a4ced8cb90b89cb8d405c';  // Replace with your Twelve Data API key
+
   try {
-    // Fetch stock data from Finnhub API (for current price)
-    const finnhubResponse = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${API_KEY_FINNHUB}`);
-    if (!finnhubResponse.ok) {
-      throw new Error('Finnhub API request failed');
-    }
+    const finnhubResponse = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${finnhubAPI}`);
+    if (!finnhubResponse.ok) throw new Error('Finnhub API request failed');
     const finnhubData = await finnhubResponse.json();
 
-    // Fetch stock data from Twelve Data API (for historical data)
-    const twelveDataResponse = await fetch(`https://api.twelvedata.com/time_series?symbol=${symbol}&interval=1min&apikey=${API_KEY_TWELVE_DATA}`);
-    if (!twelveDataResponse.ok) {
-      throw new Error('Twelve Data API request failed');
-    }
+    const twelveDataResponse = await fetch(`https://api.twelvedata.com/time_series?symbol=${symbol}&interval=1min&start_date=2024-04-22 04:00:00&end_date=2024-04-22 20:00:00&apikey=${twelveDataAPI}`);
+    if (!twelveDataResponse.ok) throw new Error('Twelve Data API request failed');
     const twelveData = await twelveDataResponse.json();
 
     return { finnhubData, twelveData };
@@ -27,35 +20,29 @@ async function fetchStockData(symbol) {
   }
 }
 
-// Function to fetch predictions (static data for testing here)
+// Static predictions for demo
 async function fetchPredictions(symbol) {
-  // Static prediction data for testing (replace with actual prediction model output)
   const predictions = {
-    'AAPL': [150.23, 151.56, 152.78, 153.12, 154.23],  // Example for AAPL stock
-    'GOOG': [2800.25, 2805.15, 2810.33, 2815.22, 2820.30]  // Example for GOOG stock
+    'AAPL': [150.23, 151.56, 152.78, 153.12, 154.23],
+    'GOOG': [2800.25, 2805.15, 2810.33, 2815.22, 2820.30]
   };
-
   return predictions[symbol] || [];
 }
 
-// Function to generate full day times (for the entire trading day)
-function generateFullDayTimes() {
-  const times = [];
-  const start = new Date();
-  start.setHours(9, 30, 0, 0); // Market opens at 9:30 AM
-  const end = new Date();
-  end.setHours(16, 0, 0, 0); // Market closes at 4:00 PM
+function generatePredictedDates(startTime, numPoints = 6) {
+  const predictedTimes = [];
+  const start = new Date(startTime);
 
-  // Generate times for each minute of the trading day
-  while (start <= end) {
-    times.push(start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-    start.setMinutes(start.getMinutes() + 1); // Increment by 1 minute
+  for (let i = 1; i <= numPoints; i++) {
+    const next = new Date(start);
+    next.setMinutes(start.getMinutes() + i * 30);
+    predictedTimes.push(next.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }));
   }
 
-  return times;
+  return predictedTimes;
 }
 
-// Display the prediction chart with zooming and panning enabled
+// Display the prediction chart
 function displayPredictionChart(dates, prices, predictedTimes = [], predictedPrices = [], fullDay = false) {
   const ctx = document.getElementById('predictionChart').getContext('2d');
 
@@ -89,27 +76,20 @@ function displayPredictionChart(dates, prices, predictedTimes = [], predictedPri
     },
     options: {
       responsive: true,
+      interaction: {
+        mode: 'index',
+        intersect: false
+      },
       scales: {
         x: {
           ticks: {
-            maxRotation: 45,
-            autoSkip: true
-          },
-          title: {
-            display: true,
-            text: 'Time'
+            autoSkip: true,
+            maxRotation: 0,
+            minRotation: 0
           }
         },
         y: {
-          ticks: {
-            callback: function (value) {
-              return '$' + value.toFixed(2);
-            }
-          },
-          title: {
-            display: true,
-            text: 'Price'
-          }
+          position: 'right'
         }
       },
       plugins: {
@@ -119,17 +99,22 @@ function displayPredictionChart(dates, prices, predictedTimes = [], predictedPri
         tooltip: {
           mode: 'index',
           intersect: false
+        },
+        zoom: {
+          pan: {
+            enabled: true,
+            mode: 'x'
+          },
+          zoom: {
+            wheel: {
+              enabled: true
+            },
+            pinch: {
+              enabled: true
+            },
+            mode: 'x'
+          }
         }
-      },
-      zoom: {
-        enabled: true,
-        mode: 'xy', // Enable zooming in both axes
-        speed: 0.1
-      },
-      pan: {
-        enabled: true,
-        mode: 'xy',
-        speed: 5
       }
     }
   });
@@ -141,16 +126,12 @@ function displayPredictionChart(dates, prices, predictedTimes = [], predictedPri
 
 // Generate buy/sell signal
 function generateBuySellSignal(predictedPrice, currentPrice) {
-  if (predictedPrice > currentPrice * 1.02) {
-    return "BUY";
-  } else if (predictedPrice < currentPrice * 0.98) {
-    return "SELL";
-  } else {
-    return "HOLD";
-  }
+  if (predictedPrice > currentPrice * 1.02) return "BUY";
+  if (predictedPrice < currentPrice * 0.98) return "SELL";
+  return "HOLD";
 }
 
-// Get best time to buy based on predictions
+// Get best time to buy
 function getBestTimeToBuy(predictedPrices, predictedTimes) {
   if (!Array.isArray(predictedPrices) || predictedPrices.length === 0 || !Array.isArray(predictedTimes) || predictedTimes.length === 0) {
     return "Not enough prediction data available.";
@@ -158,78 +139,66 @@ function getBestTimeToBuy(predictedPrices, predictedTimes) {
 
   const minPrice = Math.min(...predictedPrices);
   const index = predictedPrices.indexOf(minPrice);
-
   if (index >= 0 && predictedTimes[index]) {
     return `${predictedTimes[index]} (Predicted price: $${minPrice.toFixed(2)})`;
-  } else {
-    return "Best time could not be determined.";
   }
+  return "Best time could not be determined.";
 }
 
-// Calculate how much stock user can buy
+// Calculate buy amount
 function calculateBuyAmount(balance, currentPrice) {
   return Math.floor(balance / currentPrice);
 }
 
 // Get stock data and display
 async function getStockData(event) {
-  event.preventDefault();  // Prevent form from submitting
-
+  event.preventDefault();
   const symbol = document.getElementById('stock-symbol').value.toUpperCase();
   if (!symbol) {
     alert("Please enter a stock symbol.");
     return;
   }
 
-  // Show the spinner
   document.getElementById('loading-spinner').style.display = 'flex';
 
   try {
-    // Fetch initial stock data
-    const { finnhubData, twelveData } = await fetchStockData(symbol);
-    if (!finnhubData || !twelveData) {
-      throw new Error('Failed to fetch stock data.');
-    }
+    const result = await fetchStockData(symbol);
+    if (!result) throw new Error('Stock data not fetched.');
+    const { finnhubData, twelveData } = result;
+
     const prices = twelveData.values.map(entry => parseFloat(entry.close));
-    const times = twelveData.values.map(entry => new Date(entry.datetime).toLocaleTimeString());
+    const times = twelveData.values.map(entry => {
+      const date = new Date(entry.datetime);
+      return isNaN(date.getTime()) ? "Invalid Date" : date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+    });
 
-    // Fetch predictions
     const predictions = await fetchPredictions(symbol);
-    const predictedPrices = predictions;  // Use the actual prediction model's output here
-    const predictedTimes = generateFullDayTimes();  // Generate full day times for predictions
+    const predictedTimes = generatePredictedDates(times[times.length - 1]);
+    displayPredictionChart(times, prices, predictedTimes, predictions, true);
 
-    // Display the prediction chart
-    displayPredictionChart(times, prices, predictedTimes, predictedPrices, true);
+    const recommendation = generateBuySellSignal(predictions[0], finnhubData.c);
+    const bestTimeToBuy = getBestTimeToBuy(predictions, predictedTimes);
 
-    // Generate buy/sell signal and best time to buy
-    const recommendation = generateBuySellSignal(predictedPrices[0], finnhubData.c);
-    const bestTimeToBuy = getBestTimeToBuy(predictedPrices, predictedTimes);
-
-    // Display recommendation and best time to buy
     document.getElementById('buySellRecommendation').innerHTML = `
       <p><strong>Recommendation: </strong>${recommendation}</p>
       <p><strong>Current Price: </strong>$${finnhubData.c}</p>
-      <p><strong>Predicted Price (next): </strong>$${predictedPrices?.[0] ? predictedPrices[0].toFixed(2) : 'N/A'}</p>
+      <p><strong>Predicted Price (next): </strong>$${predictions?.[0] ? predictions[0].toFixed(2) : 'N/A'}</p>
       <p><strong>Best Time to Buy: </strong>${bestTimeToBuy}</p>
     `;
 
-    // Display amount of stock user can buy based on balance
-    const balance = 10000;  // Example balance
+    const balance = 10000;
     const buyAmount = calculateBuyAmount(balance, finnhubData.c);
     document.getElementById('buyAmountRecommendation').innerHTML = `
       <p><strong>Amount to Buy: </strong>${buyAmount} shares at $${finnhubData.c}</p>
     `;
 
-    // Show the prediction results section (which was initially hidden)
-    document.getElementById('prediction-results').style.display = 'block';  // Make the results visible
+    document.getElementById('prediction-results').style.display = 'block';
   } catch (error) {
-    alert("An error occurred while fetching data. Please try again.");
-    console.error(error); // Log the error for debugging
+    console.error(error);
+    alert("An error occurred while fetching data.");
   } finally {
-    // Hide the spinner after the data is fetched and processed
     document.getElementById('loading-spinner').style.display = 'none';
   }
 }
 
-// Event listener for form submission
 document.getElementById('stock-form').addEventListener('submit', getStockData);
