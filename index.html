@@ -5,6 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Stock Prediction</title>
   <link rel="stylesheet" href="style.css">
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+  
+  <!-- Chart.js Zoom Plugin -->
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.0"></script>
 </head>
 <body>
   <header>
@@ -29,7 +35,7 @@
     <section id="prediction-results" style="display: none;">
       <h3>Prediction Results</h3>
       <div id="chart-container">
-        <canvas id="predictionChart" width="1000" height="400"></canvas>
+        <canvas id="predictionChart"></canvas>
       </div>
       <div id="buySellRecommendation" style="margin-top: 20px;"></div>
       <div id="buyAmountRecommendation" style="margin-top: 10px;"></div>
@@ -41,10 +47,7 @@
   <footer>
     <p>&copy; 2025 StockPredictor Logan Hines</p>
   </footer>
-
-  <!-- Chart.js with Zoom Plugin -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.0"></script>
+  
   <script src="script.js"></script>
 </body>
 </html>
