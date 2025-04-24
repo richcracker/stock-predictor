@@ -182,9 +182,4 @@ document.getElementById('nextDayButton').addEventListener('click', async () => {
   if (predictions.length > 0) {
     displayPredictionChart(
       generatePredictedDates(new Date().getTime(), 12),
-      predictions.slice(0, 12),
-      generatePredictedDates(new Date().getTime(), 12),
-      predictions
-    );
-  }
-});
+     
