@@ -162,9 +162,9 @@ async function getStockData(event) {
     const prices = twelveData.values.map(entry => parseFloat(entry.close));
     const times = twelveData.values.map(entry => new Date(entry.datetime).toLocaleTimeString());
 
-    // Fetch predictions
+    // Fetch predictions (now using static data)
     const predictions = await fetchPredictions(symbol);
-    const predictedPrices = predictions;  // Use the actual prediction model's output here
+    const predictedPrices = predictions;  // Use the static prediction data
     const predictedTimes = generatePredictedDates(times[times.length - 1]);  // Generate future times for predictions
 
     // Display the prediction chart
