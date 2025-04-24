@@ -49,7 +49,20 @@ function generatePredictedDates(startTime, numPoints = 6) {
   return predictedTimes;
 }
 
-// Display the prediction chart with full trading day and value on the right
+// Generate times for the full trading day including extended hours
+function generateFullDayTimes(startTime, endTime, interval = 15) {
+  const times = [];
+  let currentTime = new Date(startTime);
+
+  while (currentTime <= endTime) {
+    times.push(currentTime.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true }));
+    currentTime.setMinutes(currentTime.getMinutes() + interval);
+  }
+
+  return times;
+}
+
+// Display the prediction chart
 function displayPredictionChart(dates, prices, predictedTimes = [], predictedPrices = [], fullDay = false) {
   const ctx = document.getElementById('predictionChart').getContext('2d');
 
@@ -57,7 +70,6 @@ function displayPredictionChart(dates, prices, predictedTimes = [], predictedPri
     window.predictionChart.destroy();
   }
 
-  // Combining all dates and prices for the full trading day
   const allLabels = [...dates, ...predictedTimes];
   const allPrices = [...prices, ...Array(predictedTimes.length).fill(null)];
   const allPredictions = [...Array(dates.length).fill(null), ...predictedPrices];
@@ -71,18 +83,14 @@ function displayPredictionChart(dates, prices, predictedTimes = [], predictedPri
           label: 'Actual Price',
           data: allPrices,
           borderColor: 'rgba(75, 192, 192, 1)',
-          backgroundColor: 'rgba(75, 192, 192, 0.2)',
-          tension: 0.1,
-          borderWidth: 2,
-          pointRadius: 0
+          tension: 0.1
         },
         {
           label: 'Predicted Price',
           data: allPredictions,
           borderColor: 'rgba(255, 99, 132, 1)',
           borderDash: [5, 5],
-          tension: 0.3,
-          pointRadius: 0
+          tension: 0.3
         }
       ]
     },
@@ -91,16 +99,9 @@ function displayPredictionChart(dates, prices, predictedTimes = [], predictedPri
       scales: {
         x: {
           ticks: {
-            maxRotation: 45,
-            autoSkip: true
-          },
-          position: 'bottom', // Keep the dates at the bottom
-        },
-        y: {
-          position: 'right', // Place the stock value on the right side
-          ticks: {
-            beginAtZero: false,
-            callback: function(value) { return `$${value.toFixed(2)}`; } // Format the y-axis labels as currency
+            maxRotation: 0,  // Horizontal labels
+            minRotation: 0,  // Horizontal labels
+            autoSkip: true    // Skip labels to avoid overlap
           }
         }
       },
@@ -110,17 +111,7 @@ function displayPredictionChart(dates, prices, predictedTimes = [], predictedPri
         },
         tooltip: {
           mode: 'index',
-          intersect: false,
-          callbacks: {
-            label: function(tooltipItem) {
-              return `$${tooltipItem.raw.toFixed(2)}`; // Show the price in tooltips
-            }
-          }
-        }
-      },
-      elements: {
-        point: {
-          radius: 0 // Hide points on the line
+          intersect: false
         }
       }
     }
@@ -129,6 +120,38 @@ function displayPredictionChart(dates, prices, predictedTimes = [], predictedPri
   if (fullDay) {
     document.getElementById('nextDayButton').style.display = 'inline-block';
   }
+}
+
+// Generate buy/sell signal
+function generateBuySellSignal(predictedPrice, currentPrice) {
+  if (predictedPrice > currentPrice * 1.02) {
+    return "BUY";
+  } else if (predictedPrice < currentPrice * 0.98) {
+    return "SELL";
+  } else {
+    return "HOLD";
+  }
+}
+
+// Get best time to buy based on predictions
+function getBestTimeToBuy(predictedPrices, predictedTimes) {
+  if (!Array.isArray(predictedPrices) || predictedPrices.length === 0 || !Array.isArray(predictedTimes) || predictedTimes.length === 0) {
+    return "Not enough prediction data available.";
+  }
+
+  const minPrice = Math.min(...predictedPrices);
+  const index = predictedPrices.indexOf(minPrice);
+
+  if (index >= 0 && predictedTimes[index]) {
+    return `${predictedTimes[index]} (Predicted price: $${minPrice.toFixed(2)})`;
+  } else {
+    return "Best time could not be determined.";
+  }
+}
+
+// Calculate how much stock user can buy
+function calculateBuyAmount(balance, currentPrice) {
+  return Math.floor(balance / currentPrice);
 }
 
 // Get stock data and display
@@ -153,13 +176,18 @@ async function getStockData(event) {
     const prices = twelveData.values.map(entry => parseFloat(entry.close));
     const times = twelveData.values.map(entry => new Date(entry.datetime).toLocaleTimeString());
 
-    // Fetch predictions (now using static data)
+    // Fetch predictions
     const predictions = await fetchPredictions(symbol);
-    const predictedPrices = predictions;  // Use the static prediction data
+    const predictedPrices = predictions;  // Use the actual prediction model's output here
     const predictedTimes = generatePredictedDates(times[times.length - 1]);  // Generate future times for predictions
 
+    // Generate full trading day times (adjust according to your needs)
+    const startOfDay = new Date('2025-04-24T09:30:00');  // Replace with real start time
+    const endOfDay = new Date('2025-04-24T16:00:00');  // Replace with real end time
+    const fullDayTimes = generateFullDayTimes(startOfDay, endOfDay);  // Generate times for the full trading day
+
     // Display the prediction chart
-    displayPredictionChart(times, prices, predictedTimes, predictedPrices);
+    displayPredictionChart(fullDayTimes, prices, predictedTimes, predictedPrices, true);
 
     // Generate buy/sell signal and best time to buy
     const recommendation = generateBuySellSignal(predictedPrices[0], finnhubData.c);
