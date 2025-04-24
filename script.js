@@ -1,16 +1,19 @@
+// API Keys
+const API_KEY_FINNHUB = 'd00h83pr01qk939o3nn0d00h83pr01qk939o3nng';  // Insert your Finnhub API key here
+const API_KEY_TWELVE_DATA = '927a99953b2a4ced8cb90b89cb8d405c';  // Insert your Twelve Data API key here
+
 // Fetch stock data from Finnhub and Twelve Data APIs
 async function fetchStockData(symbol) {
-  const finnhubAPI = 'd00h83pr01qk939o3nn0d00h83pr01qk939o3nng';  // Replace with your Finnhub API key
-  const twelveDataAPI = '927a99953b2a4ced8cb90b89cb8d405c';  // Replace with your Twelve Data API key
-
   try {
-    const finnhubResponse = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${finnhubAPI}`);
+    // Fetch stock data from Finnhub API (for current price)
+    const finnhubResponse = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${API_KEY_FINNHUB}`);
     if (!finnhubResponse.ok) {
       throw new Error('Finnhub API request failed');
     }
     const finnhubData = await finnhubResponse.json();
 
-    const twelveDataResponse = await fetch(`https://api.twelvedata.com/time_series?symbol=${symbol}&interval=1min&apikey=${twelveDataAPI}`);
+    // Fetch stock data from Twelve Data API (for historical data)
+    const twelveDataResponse = await fetch(`https://api.twelvedata.com/time_series?symbol=${symbol}&interval=1min&apikey=${API_KEY_TWELVE_DATA}`);
     if (!twelveDataResponse.ok) {
       throw new Error('Twelve Data API request failed');
     }
@@ -24,56 +27,35 @@ async function fetchStockData(symbol) {
   }
 }
 
-// Function to fetch predictions (use static data here for now)
+// Function to fetch predictions (static data for testing here)
 async function fetchPredictions(symbol) {
-  // Static prediction data for testing (you can replace this with actual predictions)
+  // Static prediction data for testing (replace with actual prediction model output)
   const predictions = {
     'AAPL': [150.23, 151.56, 152.78, 153.12, 154.23],  // Example for AAPL stock
     'GOOG': [2800.25, 2805.15, 2810.33, 2815.22, 2820.30]  // Example for GOOG stock
   };
 
-  // Check if symbol exists in static data, otherwise return an empty array
   return predictions[symbol] || [];
 }
 
-function generatePredictedDates(startTime, numPoints = 6) {
-  const predictedTimes = [];
-  const start = new Date(startTime);
-
-  for (let i = 1; i <= numPoints; i++) {
-    const next = new Date(start);
-    next.setMinutes(start.getMinutes() + i * 30); // 30-minute intervals
-    predictedTimes.push(next.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true }));
-  }
-
-  return predictedTimes;
-}
-
-// Generate times for the full trading day including extended hours
-function generateFullDayTimes(startTime, endTime, interval = 15) {
+// Function to generate full day times (for the entire trading day)
+function generateFullDayTimes() {
   const times = [];
-  let currentTime = new Date(startTime);
+  const start = new Date();
+  start.setHours(9, 30, 0, 0); // Market opens at 9:30 AM
+  const end = new Date();
+  end.setHours(16, 0, 0, 0); // Market closes at 4:00 PM
 
-  while (currentTime <= endTime) {
-    times.push(currentTime.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true }));
-    currentTime.setMinutes(currentTime.getMinutes() + interval);
+  // Generate times for each minute of the trading day
+  while (start <= end) {
+    times.push(start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+    start.setMinutes(start.getMinutes() + 1); // Increment by 1 minute
   }
 
   return times;
 }
 
-// Function to generate buy/sell signal based on predicted price
-function generateBuySellSignal(predictedPrice, currentPrice) {
-  if (predictedPrice > currentPrice * 1.02) {
-    return "BUY";
-  } else if (predictedPrice < currentPrice * 0.98) {
-    return "SELL";
-  } else {
-    return "HOLD";
-  }
-}
-
-// Display the prediction chart
+// Display the prediction chart with zooming and panning enabled
 function displayPredictionChart(dates, prices, predictedTimes = [], predictedPrices = [], fullDay = false) {
   const ctx = document.getElementById('predictionChart').getContext('2d');
 
@@ -110,9 +92,23 @@ function displayPredictionChart(dates, prices, predictedTimes = [], predictedPri
       scales: {
         x: {
           ticks: {
-            maxRotation: 0,  // Horizontal labels
-            minRotation: 0,  // Horizontal labels
-            autoSkip: true    // Skip labels to avoid overlap
+            maxRotation: 45,
+            autoSkip: true
+          },
+          title: {
+            display: true,
+            text: 'Time'
+          }
+        },
+        y: {
+          ticks: {
+            callback: function (value) {
+              return '$' + value.toFixed(2);
+            }
+          },
+          title: {
+            display: true,
+            text: 'Price'
           }
         }
       },
@@ -124,6 +120,16 @@ function displayPredictionChart(dates, prices, predictedTimes = [], predictedPri
           mode: 'index',
           intersect: false
         }
+      },
+      zoom: {
+        enabled: true,
+        mode: 'xy', // Enable zooming in both axes
+        speed: 0.1
+      },
+      pan: {
+        enabled: true,
+        mode: 'xy',
+        speed: 5
       }
     }
   });
@@ -131,6 +137,38 @@ function displayPredictionChart(dates, prices, predictedTimes = [], predictedPri
   if (fullDay) {
     document.getElementById('nextDayButton').style.display = 'inline-block';
   }
+}
+
+// Generate buy/sell signal
+function generateBuySellSignal(predictedPrice, currentPrice) {
+  if (predictedPrice > currentPrice * 1.02) {
+    return "BUY";
+  } else if (predictedPrice < currentPrice * 0.98) {
+    return "SELL";
+  } else {
+    return "HOLD";
+  }
+}
+
+// Get best time to buy based on predictions
+function getBestTimeToBuy(predictedPrices, predictedTimes) {
+  if (!Array.isArray(predictedPrices) || predictedPrices.length === 0 || !Array.isArray(predictedTimes) || predictedTimes.length === 0) {
+    return "Not enough prediction data available.";
+  }
+
+  const minPrice = Math.min(...predictedPrices);
+  const index = predictedPrices.indexOf(minPrice);
+
+  if (index >= 0 && predictedTimes[index]) {
+    return `${predictedTimes[index]} (Predicted price: $${minPrice.toFixed(2)})`;
+  } else {
+    return "Best time could not be determined.";
+  }
+}
+
+// Calculate how much stock user can buy
+function calculateBuyAmount(balance, currentPrice) {
+  return Math.floor(balance / currentPrice);
 }
 
 // Get stock data and display
@@ -158,15 +196,10 @@ async function getStockData(event) {
     // Fetch predictions
     const predictions = await fetchPredictions(symbol);
     const predictedPrices = predictions;  // Use the actual prediction model's output here
-    const predictedTimes = generatePredictedDates(times[times.length - 1]);  // Generate future times for predictions
-
-    // Generate full trading day times (adjust according to your needs)
-    const startOfDay = new Date('2025-04-24T09:30:00');  // Replace with real start time
-    const endOfDay = new Date('2025-04-24T16:00:00');  // Replace with real end time
-    const fullDayTimes = generateFullDayTimes(startOfDay, endOfDay);  // Generate times for the full trading day
+    const predictedTimes = generateFullDayTimes();  // Generate full day times for predictions
 
     // Display the prediction chart
-    displayPredictionChart(fullDayTimes, prices, predictedTimes, predictedPrices, true);
+    displayPredictionChart(times, prices, predictedTimes, predictedPrices, true);
 
     // Generate buy/sell signal and best time to buy
     const recommendation = generateBuySellSignal(predictedPrices[0], finnhubData.c);
