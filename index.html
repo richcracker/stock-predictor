@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Stock Prediction</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Stock Prediction Engine</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
 </head>
 <body>
   <header>
@@ -12,45 +14,35 @@
   </header>
 
   <main>
-    <section class="form-container">
+    <div class="form-container">
       <h2>Enter Stock Symbol</h2>
       <form id="stock-form">
-        <input type="text" id="stock-symbol" placeholder="Enter symbol (e.g., AAPL)" required>
+        <input type="text" id="stock-symbol" placeholder="Enter stock symbol (e.g., AAPL)" />
         <button type="submit">Get Prediction</button>
       </form>
-    </section>
-
-    <!-- Spinner -->
-    <div id="loading-spinner" style="display: none;">
-      <div class="spinner"></div>
-      <p>Loading prediction...</p>
     </div>
 
-    <section id="prediction-results" style="display: none;">
-      <h3>Prediction Results</h3>
-      <div id="chart-container">
-        <canvas id="predictionChart"></canvas>
-      </div>
-      
-      <div class="zoom-controls">
-        <button id="zoomIn">Zoom In</button>
-        <button id="zoomOut">Zoom Out</button>
-      </div>
+    <div id="loading-spinner" style="display: none;">
+      <div class="spinner"></div>
+      <p>Loading data...</p>
+    </div>
 
-      <div id="buySellRecommendation" style="margin-top: 20px;"></div>
-      <div id="buyAmountRecommendation" style="margin-top: 10px;"></div>
+    <div id="prediction-results" style="display: none;">
+      <h3>Stock Prediction Results</h3>
+      <div id="buySellRecommendation"></div>
+      <div id="buyAmountRecommendation"></div>
+      <button id="nextDayButton" style="display: none;">Next Day Prediction</button>
+    </div>
 
-      <!-- Next Day Button for navigating to the next prediction -->
-      <button id="nextDayButton" style="display: none;">Next Day</button>
-    </section>
+    <div id="chart-container">
+      <canvas id="predictionChart"></canvas>
+    </div>
   </main>
 
   <footer>
-    <p>&copy; 2025 StockPredictor Logan Hines</p>
+    <p>Stock Prediction Engine - Your AI-Driven Financial Assistant</p>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@1.0.1/dist/chartjs-plugin-zoom.min.js"></script>
-  <script src="script.js"></script>
+  <script src="scripts.js"></script>
 </body>
 </html>
