@@ -109,5 +109,50 @@ function displayPredictionChart(dates, prices, predictedTimes = [], predictedPri
           },
           zoom: {
             wheel: {
-              enabled
+              enabled: true,
+              speed: 0.1,
+              sensitivity: 1
+            }
+          }
+        }
+      }
+    }
+  });
+}
 
+// Handle the stock prediction form submission
+document.getElementById('stock-form').addEventListener('submit', async (event) => {
+  event.preventDefault();
+
+  const symbol = document.getElementById('stock-symbol').value.toUpperCase();
+  document.getElementById('loading-spinner').style.display = 'flex';
+  
+  // Fetch stock data
+  const stockData = await fetchStockData(symbol);
+  if (!stockData) return;
+
+  const { finnhubData, twelveData } = stockData;
+
+  // Fetch predictions
+  const predictions = await fetchPredictions(symbol);
+
+  // Get the predicted times and prices
+  const predictedTimes = generatePredictedDates(new Date());
+  const predictedPrices = predictions;
+
+  // Display the prediction chart
+  displayPredictionChart(
+    twelveData.values.slice(0, 6).map(item => item.datetime),
+    twelveData.values.slice(0, 6).map(item => parseFloat(item.close)),
+    predictedTimes,
+    predictedPrices
+  );
+
+  // Update recommendation section
+  document.getElementById('buySellRecommendation').innerHTML = `Buy/Sell Recommendation: ${finnhubData.c > finnhubData.o ? 'Buy' : 'Sell'}`;
+  document.getElementById('buyAmountRecommendation').innerHTML = `Recommended Amount to Buy: ${finnhubData.c > finnhubData.o ? '100 shares' : '50 shares'}`;
+
+  // Show results and hide the loading spinner
+  document.getElementById('loading-spinner').style.display = 'none';
+  document.getElementById('prediction-results').style.display = 'block';
+});
