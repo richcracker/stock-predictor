@@ -110,12 +110,15 @@ function displayPredictionChart(dates, prices, predictedTimes = [], predictedPri
             threshold: 10
           },
           zoom: {
-            enabled: true,
-            mode: 'xy',
-            speed: 0.1,
-            sensitivity: 3,
-            onZoomComplete: function() {
-              console.log("Zoom completed");
+            wheel: {
+              enabled: true,
+              speed: 0.1
+            },
+            pinch: {
+              enabled: true
+            },
+            drag: {
+              enabled: true
             }
           }
         }
@@ -222,4 +225,3 @@ async function getStockData(event) {
 
 // Event listener for form submission
 document.getElementById('stock-form').addEventListener('submit', getStockData);
-
