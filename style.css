@@ -114,18 +114,13 @@ footer p {
   background-color: #555;
 }
 
-#chart-container {
-  position: relative;
+#predictionChart {
+  margin-top: 20px;
   width: 100%;
   max-width: 100%;
-  margin-top: 20px;
 }
 
-canvas {
-  border: 1px solid #ccc;
-  background-color: #f9f9f9;
-}
-
+/* Spinner Styles */
 #loading-spinner {
   display: flex;
   flex-direction: column;
