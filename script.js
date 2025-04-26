@@ -181,8 +181,14 @@ async function getStockData(event) {
 // Event listener for form submission
 document.getElementById('stock-form').addEventListener('submit', getStockData);
 
-// Scroll to the prediction form section when the button is clicked
+// Scroll to the prediction form section when the "Let's Start Predicting" button is clicked
 function scrollToPredictionSection() {
   const predictionSection = document.getElementById('prediction-section');
-  predictionSection.scrollIntoView({ behavior: 'smooth' });
+  if (predictionSection) {
+    predictionSection.scrollIntoView({ behavior: 'smooth' });
+  }
 }
+
+// Event listener for the "Let's Start Predicting" button
+document.getElementById('start-predicting-button').addEventListener('click', scrollToPredictionSection);
+
