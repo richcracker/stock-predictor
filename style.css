@@ -1,16 +1,13 @@
-/* Reset some default styling */
 body, h1, p, form, input, button {
   margin: 0;
   padding: 0;
   font-family: 'Roboto', sans-serif;
 }
 
-/* Basic styling */
 body {
   background-color: #f4f7fa;
   color: #333;
   font-size: 16px;
-  line-height: 1.5;
 }
 
 .container {
@@ -85,4 +82,3 @@ canvas {
 #nextDayButton:hover {
   background-color: #0056b3;
 }
-
