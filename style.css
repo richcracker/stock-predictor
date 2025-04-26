@@ -21,6 +21,12 @@ header {
 
 header h1 {
   font-size: 2.5rem;
+  margin-bottom: 5px;
+}
+
+header .subtext {
+  font-size: 1rem;
+  color: #bbb;
 }
 
 main {
@@ -34,6 +40,7 @@ main {
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
 }
 
 .form-container h2 {
@@ -45,13 +52,15 @@ main {
 #stock-form {
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
 }
 
 #stock-symbol {
   padding: 10px;
   font-size: 1rem;
   margin-right: 10px;
-  width: 200px;
+  width: 220px;
+  max-width: 100%;
   border-radius: 5px;
   border: 1px solid #ccc;
 }
@@ -63,6 +72,7 @@ button {
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  font-size: 1rem;
 }
 
 button:hover {
@@ -80,16 +90,23 @@ button:hover {
 #prediction-results h3 {
   font-size: 1.8rem;
   margin-bottom: 20px;
+  text-align: center;
 }
 
-#buySellRecommendation, #buyAmountRecommendation {
+#buySellRecommendation, 
+#buyAmountRecommendation {
   margin-top: 20px;
   font-size: 1.2rem;
+  text-align: center;
+}
+
+.recommendation {
+  font-weight: bold;
 }
 
 footer {
   text-align: center;
-  margin-top: 30px;
+  margin-top: 40px;
   font-size: 1rem;
   color: #888;
 }
@@ -99,7 +116,8 @@ footer p {
 }
 
 #nextDayButton {
-  margin-top: 20px;
+  margin: 20px auto 0 auto;
+  display: block;
   padding: 10px 20px;
   background-color: #333;
   color: #fff;
@@ -107,18 +125,21 @@ footer p {
   border-radius: 5px;
   cursor: pointer;
   font-size: 1rem;
-  display: inline-block;
 }
 
 #nextDayButton:hover {
   background-color: #555;
 }
 
-#predictionChart {
+#chart-container {
   margin-top: 20px;
+}
+
+#predictionChart {
   width: 100%;
   max-width: 100%;
 }
+
 /* Spinner Styles */
 #loading-spinner {
   display: flex;
