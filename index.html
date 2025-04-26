@@ -4,62 +4,37 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Stock Market Prediction Engine</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="styles.css">  <!-- Link to your external CSS file -->
 </head>
 <body>
-  
-  <!-- Header -->
-  <header>
+  <div class="container">
     <h1>Stock Market Prediction Engine</h1>
-    <p class="subtext">Free Real-Time AI Stock Predictions</p>
-  </header>
-
-  <main>
-
-    <!-- Stock Input Form -->
-    <section class="form-container">
-      <h2>Enter Stock Symbol</h2>
-      <form id="stock-form">
-        <input type="text" id="stock-symbol" placeholder="Enter symbol (e.g., AAPL)" required>
-        <button type="submit">🔎 Get Prediction</button>
-      </form>
-    </section>
+    
+    <!-- Stock Symbol Input Form -->
+    <form id="stock-form">
+      <input type="text" id="stock-symbol" placeholder="Enter stock symbol" required />
+      <button type="submit">Get Stock Prediction</button>
+    </form>
 
     <!-- Loading Spinner -->
-    <div id="loading-spinner" style="display: none;">
-      <div class="spinner"></div>
-      <p>Loading prediction...</p>
+    <div id="loading-spinner" style="display:none;">
+      <p>Loading...</p>
     </div>
 
     <!-- Prediction Results -->
-    <section id="prediction-results" style="display: none;">
-      <h3>Prediction Results</h3>
-
-      <!-- Chart Container -->
-      <div id="chart-container">
-        <canvas id="predictionChart"></canvas>
-      </div>
+    <div id="prediction-results" style="display:none;">
+      <canvas id="predictionChart"></canvas>
 
       <!-- Buy/Sell Recommendation -->
-      <div id="buySellRecommendation" class="recommendation"></div>
+      <div id="buySellRecommendation"></div>
+      <div id="buyAmountRecommendation"></div>
 
-      <!-- Buy Amount Suggestion -->
-      <div id="buyAmountRecommendation" class="recommendation"></div>
+      <!-- Next Day Button (hidden by default) -->
+      <button id="nextDayButton" style="display:none;">Next Trading Day Prediction</button>
+    </div>
+  </div>
 
-      <!-- Next Day Navigation Button -->
-      <button id="nextDayButton" style="display: none;">➡️ Next Day Prediction</button>
-    </section>
-
-  </main>
-
-  <!-- Footer -->
-  <footer>
-    <p>&copy; 2025 StockPredictor | Created by Logan Hines</p>
-  </footer>
-
-  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="script.js"></script>
-
+  <script src="script.js"></script>  <!-- Link to your external JS file -->
 </body>
 </html>
