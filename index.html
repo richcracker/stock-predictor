@@ -7,18 +7,35 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- Homepage Section -->
   <header>
     <h1>Stock Market Prediction Engine</h1>
   </header>
 
   <main>
-    <section class="form-container">
+    <!-- New Homepage Section -->
+    <section class="homepage-info">
+      <h2>Welcome to the Stock Market Prediction Engine</h2>
+      <p>We provide real-time stock predictions based on advanced machine learning models. Enter a stock symbol to get an accurate forecast and make informed decisions.</p>
+      
+      <!-- Image Examples -->
+      <div class="image-gallery">
+        <img src="your-image-1.jpg" alt="Stock Market" class="homepage-image">
+        <img src="your-image-2.jpg" alt="Financial Graph" class="homepage-image">
+      </div>
+
+      <button id="start-predicting-button" class="button" onclick="scrollToPredictionSection()">Let's Start Predicting</button>
+    </section>
+
+    <!-- Stock Prediction Form Section -->
+    <section class="form-container" id="prediction-section" style="display: none;">
       <h2>Enter Stock Symbol</h2>
       <form id="stock-form">
         <input type="text" id="stock-symbol" placeholder="Enter symbol (e.g., AAPL)" required>
         <button type="submit">Get Prediction</button>
       </form>
     </section>
+
     <!-- Spinner -->
     <div id="loading-spinner" style="display: none;">
       <div class="spinner"></div>
@@ -32,7 +49,6 @@
       </div>
       <div id="buySellRecommendation" style="margin-top: 20px;"></div>
       <div id="buyAmountRecommendation" style="margin-top: 10px;"></div>
-      <!-- Next Day Button for navigating to the next prediction -->
       <button id="nextDayButton" style="display: none;">Next Day</button>
     </section>
   </main>
