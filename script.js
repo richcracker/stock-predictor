@@ -12,10 +12,13 @@ async function fetchStockData(symbol) {
   return { finnhubData, twelveData };
 }
 
-// Function to fetch predictions (You can replace this with actual ML predictions)
+// Function to fetch predictions (For now, using local JSON data for example)
 async function fetchPredictions(symbol) {
-  const response = await fetch('https://raw.githubusercontent.com/richcracker/stock-predictor/main/predictions.json');
-  const data = await response.json();
+  // Use local data or adjust URL to valid path when ready
+  const data = {
+    "AAPL": [145.5, 146.0, 147.0, 148.5, 149.0, 150.0],  // Example data for Apple stock
+    "GOOG": [2780, 2790, 2805, 2820, 2835, 2850]  // Example data for Google stock
+  };
   return data[symbol] || [];
 }
 
@@ -179,6 +182,6 @@ async function getStockData(event) {
   }
 }
 
-
 // Event listener for form submission
 document.getElementById('stock-form').addEventListener('submit', getStockData);
+
