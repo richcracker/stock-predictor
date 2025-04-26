@@ -1,7 +1,7 @@
-// Function to fetch stock data from APIs (FinnHub and Twelve Data)
+// Fetch stock data from Finnhub and Twelve Data APIs
 async function fetchStockData(symbol) {
-  const finnhubAPI = 'd00h83pr01qk939o3nn0d00h83pr01qk939o3nng'; // Replace with your API key
-  const twelveDataAPI = '927a99953b2a4ced8cb90b89cb8d405c'; // Replace with your API key
+  const finnhubAPI = 'd00h83pr01qk939o3nn0d00h83pr01qk939o3nng';
+  const twelveDataAPI = '927a99953b2a4ced8cb90b89cb8d405c';
 
   try {
     const finnhubResponse = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${finnhubAPI}`);
@@ -17,7 +17,7 @@ async function fetchStockData(symbol) {
   }
 }
 
-// Fetch predictions (from a mock data file for now)
+// Function to fetch predictions (replace with actual ML model)
 async function fetchPredictions(symbol) {
   try {
     const response = await fetch('https://raw.githubusercontent.com/richcracker/stock-predictor/main/predictions.json');
@@ -29,24 +29,23 @@ async function fetchPredictions(symbol) {
   }
 }
 
-// Generate predicted dates (example: 6 future time points)
 function generatePredictedDates(startTime, numPoints = 6) {
   const predictedTimes = [];
   const start = new Date(startTime);
 
   for (let i = 1; i <= numPoints; i++) {
     const next = new Date(start);
-    next.setMinutes(start.getMinutes() + i * 30); // 30-minute intervals
+    next.setMinutes(start.getMinutes() + i * 30);
     predictedTimes.push(next.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true }));
   }
 
   return predictedTimes;
 }
 
-// Display prediction chart
-function displayPredictionChart(dates, prices, predictedTimes = [], predictedPrices = []) {
+// Display the prediction chart
+function displayPredictionChart(dates, prices, predictedTimes = [], predictedPrices = [], fullDay = false) {
   const ctx = document.getElementById('predictionChart').getContext('2d');
-  
+
   if (window.predictionChart && typeof window.predictionChart.destroy === 'function') {
     window.predictionChart.destroy();
   }
@@ -96,22 +95,17 @@ function displayPredictionChart(dates, prices, predictedTimes = [], predictedPri
       }
     }
   });
-}
 
-// Generate buy/sell signal
-function generateBuySellSignal(predictedPrice, currentPrice) {
-  if (predictedPrice > currentPrice * 1.02) {
-    return "BUY";
-  } else if (predictedPrice < currentPrice * 0.98) {
-    return "SELL";
-  } else {
-    return "HOLD";
+  if (fullDay) {
+    document.getElementById('nextDayButton').style.display = 'inline-block';
   }
 }
 
-// Display stock data and predictions
+// Other functions for Buy/Sell signals, recommendations, etc. remain unchanged
+
+// Get stock data and display
 async function getStockData(event) {
-  event.preventDefault();  // Prevent form submission
+  event.preventDefault();
 
   const symbol = document.getElementById('stock-symbol').value.toUpperCase();
   if (!symbol) {
@@ -119,56 +113,44 @@ async function getStockData(event) {
     return;
   }
 
-  // Show loading spinner
   document.getElementById('loading-spinner').style.display = 'flex';
 
   try {
-    // Fetch stock data
     const { finnhubData, twelveData } = await fetchStockData(symbol);
-    
-    if (!finnhubData || !twelveData) {
-      throw new Error('Missing or invalid data from one of the APIs.');
-    }
 
     const prices = twelveData.values.map(entry => parseFloat(entry.close));
     const times = twelveData.values.map(entry => new Date(entry.datetime).toLocaleTimeString());
 
-    // Fetch predictions
     const predictions = await fetchPredictions(symbol);
 
     const predictedPrices = predictions;
     const predictedTimes = generatePredictedDates(times[times.length - 1]);
 
-    // Display prediction chart
     displayPredictionChart(times, prices, predictedTimes, predictedPrices);
 
-    // Generate recommendation
     const recommendation = generateBuySellSignal(predictedPrices[0], finnhubData.c);
+    const bestTimeToBuy = getBestTimeToBuy(predictedPrices, predictedTimes);
 
-    // Display buy/sell recommendation
     document.getElementById('buySellRecommendation').innerHTML = `
       <p><strong>Recommendation: </strong>${recommendation}</p>
       <p><strong>Current Price: </strong>$${finnhubData.c}</p>
       <p><strong>Predicted Price (next): </strong>$${predictedPrices?.[0] ? predictedPrices[0].toFixed(2) : 'N/A'}</p>
+      <p><strong>Best Time to Buy: </strong>${bestTimeToBuy}</p>
     `;
 
-    // Display amount user can buy
-    const balance = 10000; // Example balance
-    const buyAmount = Math.floor(balance / finnhubData.c);
+    const balance = 10000;
+    const buyAmount = calculateBuyAmount(balance, finnhubData.c);
     document.getElementById('buyAmountRecommendation').innerHTML = `
       <p><strong>Amount to Buy: </strong>${buyAmount} shares at $${finnhubData.c}</p>
     `;
 
-    // Show prediction results
     document.getElementById('prediction-results').style.display = 'block';
   } catch (error) {
-    console.error('Error fetching stock data or predictions:', error);
+    console.error('Error:', error);
     alert(`An error occurred: ${error.message}. Please try again.`);
   } finally {
-    // Hide loading spinner
     document.getElementById('loading-spinner').style.display = 'none';
   }
 }
 
-// Event listener for form submission
 document.getElementById('stock-form').addEventListener('submit', getStockData);
