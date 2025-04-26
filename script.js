@@ -186,9 +186,14 @@ function scrollToPredictionSection() {
   const predictionSection = document.getElementById('prediction-section');
   if (predictionSection) {
     predictionSection.scrollIntoView({ behavior: 'smooth' });
+  } else {
+    console.error('Prediction section not found!');
   }
 }
 
 // Event listener for the "Let's Start Predicting" button
-document.getElementById('start-predicting-button').addEventListener('click', scrollToPredictionSection);
+document.getElementById('start-predicting-button').addEventListener('click', function(event) {
+  event.preventDefault();  // Prevent any default action (though there might not be one)
+  scrollToPredictionSection();
+});
 
