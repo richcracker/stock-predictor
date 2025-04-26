@@ -139,44 +139,46 @@ async function getStockData(event) {
   try {
     // Fetch initial stock data
     const { finnhubData, twelveData } = await fetchStockData(symbol);
-    const prices = twelveData.values
-    const prices = twelveData.values.map(item => parseFloat(item.close));
-    const dates = twelveData.values.map(item => item.datetime);
+    const prices = twelveData.values.map(entry => parseFloat(entry.close));
+    const times = twelveData.values.map(entry => new Date(entry.datetime).toLocaleTimeString());
 
-    // Fetch prediction data
-    const predictionData = await fetchPredictions(symbol);
-    const predictedPrices = predictionData.map(item => parseFloat(item.predictedPrice));
-    const predictedTimes = generatePredictedDates(dates[dates.length - 1]);
+    // Fetch predictions
+    const predictions = await fetchPredictions(symbol);
+    const predictedPrices = predictions;  // Use the actual prediction model's output here
+    const predictedTimes = generatePredictedDates(times[times.length - 1]);  // Generate future times for predictions
 
-    // Hide the loading spinner
-    document.getElementById('loading-spinner').style.display = 'none';
+    // Display the prediction chart
+    displayPredictionChart(times, prices, predictedTimes, predictedPrices);
 
-    // Display prediction chart
-    displayPredictionChart(dates, prices, predictedTimes, predictedPrices, true);
-
-    // Generate buy/sell recommendation based on the predicted price
-    const buySellRecommendation = generateBuySellSignal(predictedPrices[0], prices[prices.length - 1]);
-    document.getElementById('buySellRecommendation').innerText = `Recommendation: ${buySellRecommendation}`;
-
-    // Get the best time to buy
+    // Generate buy/sell signal and best time to buy
+    const recommendation = generateBuySellSignal(predictedPrices[0], finnhubData.c);
     const bestTimeToBuy = getBestTimeToBuy(predictedPrices, predictedTimes);
-    document.getElementById('buyAmountRecommendation').innerText = `Best time to buy: ${bestTimeToBuy}`;
 
-    // Show the prediction results section
-    document.getElementById('prediction-results').style.display = 'block';
+    // Display recommendation and best time to buy
+    document.getElementById('buySellRecommendation').innerHTML = `
+      <p><strong>Recommendation: </strong>${recommendation}</p>
+      <p><strong>Current Price: </strong>$${finnhubData.c}</p>
+      <p><strong>Predicted Price (next): </strong>$${predictedPrices?.[0] ? predictedPrices[0].toFixed(2) : 'N/A'}</p>
+      <p><strong>Best Time to Buy: </strong>${bestTimeToBuy}</p>
+    `;
 
-    // Add event listener to the Next Day button (if displayed)
-    document.getElementById('nextDayButton').addEventListener('click', function() {
-      // Display the prediction for the next trading day
-      const nextPredictedPrice = predictedPrices[1] || "No data available";
-      alert(`Next predicted price: $${nextPredictedPrice}`);
-    });
+    // Display amount of stock user can buy based on balance
+    const balance = 10000;  // Example balance
+    const buyAmount = calculateBuyAmount(balance, finnhubData.c);
+    document.getElementById('buyAmountRecommendation').innerHTML = `
+      <p><strong>Amount to Buy: </strong>${buyAmount} shares at $${finnhubData.c}</p>
+    `;
+
+    // Show the prediction results section (which was initially hidden)
+    document.getElementById('prediction-results').style.display = 'block';  // Make the results visible
   } catch (error) {
-    // Hide the loading spinner
-    document.getElementById('loading-spinner').style.display = 'none';
     alert("An error occurred while fetching data. Please try again.");
+  } finally {
+    // Hide the spinner after the data is fetched and processed
+    document.getElementById('loading-spinner').style.display = 'none';
   }
 }
 
-// Add event listener to the form submit button
+
+// Event listener for form submission
 document.getElementById('stock-form').addEventListener('submit', getStockData);
