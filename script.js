@@ -185,6 +185,7 @@ document.getElementById('stock-form').addEventListener('submit', getStockData);
 function scrollToPredictionSection() {
   const predictionSection = document.getElementById('prediction-section');
   if (predictionSection) {
+    console.log('Scrolling to prediction section...');  // Added log for debugging
     predictionSection.scrollIntoView({ behavior: 'smooth' });
   } else {
     console.error('Prediction section not found!');
@@ -193,7 +194,7 @@ function scrollToPredictionSection() {
 
 // Event listener for the "Let's Start Predicting" button
 document.getElementById('start-predicting-button').addEventListener('click', function(event) {
+  console.log('Button clicked!');  // Log the button click to confirm it's being clicked
   event.preventDefault();  // Prevent any default action (though there might not be one)
   scrollToPredictionSection();
 });
-
