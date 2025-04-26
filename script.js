@@ -1,3 +1,15 @@
+// Event listener for the "Let's Start Predicting" button
+document.getElementById('start-predicting-button').addEventListener('click', function(event) {
+  console.log('Button clicked!');  // For debugging
+  event.preventDefault();  // Prevent default button behavior
+  
+  // Hide homepage content
+  document.getElementById('homepage-content').style.display = 'none';
+  
+  // Show prediction form
+  document.getElementById('prediction-form-container').style.display = 'block';
+});
+
 // Fetch stock data from Finnhub and Twelve Data APIs
 async function fetchStockData(symbol) {
   const finnhubAPI = 'd00h83pr01qk939o3nn0d00h83pr01qk939o3nng';  // Replace with your Finnhub API key
@@ -158,43 +170,4 @@ async function getStockData(event) {
     document.getElementById('buySellRecommendation').innerHTML = `
       <p><strong>Recommendation: </strong>${recommendation}</p>
       <p><strong>Current Price: </strong>$${finnhubData.c}</p>
-      <p><strong>Predicted Price (next): </strong>$${predictedPrices?.[0] ? predictedPrices[0].toFixed(2) : 'N/A'}</p>
-      <p><strong>Best Time to Buy: </strong>${bestTimeToBuy}</p>
-    `;
-
-    // Display amount of stock user can buy based on balance
-    const balance = 10000;  // Example balance
-    const buyAmount = calculateBuyAmount(balance, finnhubData.c);
-    document.getElementById('buyAmountRecommendation').innerHTML = `
-      <p><strong>Amount to Buy: </strong>${buyAmount} shares at $${finnhubData.c}</p>
-    `;
-
-    // Show the prediction results section (which was initially hidden)
-    document.getElementById('prediction-results').style.display = 'block';  // Make the results visible
-  } catch (error) {
-    alert("An error occurred while fetching data. Please try again.");
-  } finally {
-    // Hide the spinner after the data is fetched and processed
-    document.getElementById('loading-spinner').style.display = 'none';
-  }
-}
-// Event listener for form submission
-document.getElementById('stock-form').addEventListener('submit', getStockData);
-
-// Scroll to the prediction form section when the "Let's Start Predicting" button is clicked
-function scrollToPredictionSection() {
-  const predictionSection = document.getElementById('prediction-section');
-  if (predictionSection) {
-    console.log('Scrolling to prediction section...');  // Added log for debugging
-    predictionSection.scrollIntoView({ behavior: 'smooth' });
-  } else {
-    console.error('Prediction section not found!');
-  }
-}
-
-// Event listener for the "Let's Start Predicting" button
-document.getElementById('start-predicting-button').addEventListener('click', function(event) {
-  console.log('Button clicked!');  // Log the button click to confirm it's being clicked
-  event.preventDefault();  // Prevent any default action (though there might not be one)
-  scrollToPredictionSection();
-});
+      <p
