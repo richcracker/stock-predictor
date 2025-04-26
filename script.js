@@ -63,25 +63,32 @@ function displayPredictionChart(dates, prices, predictedTimes = [], predictedPri
           label: 'Actual Price',
           data: allPrices,
           borderColor: 'rgba(75, 192, 192, 1)',
-          tension: 0.1
+          tension: 0.1,
+          fill: false
         },
         {
           label: 'Predicted Price',
           data: allPredictions,
           borderColor: 'rgba(255, 99, 132, 1)',
           borderDash: [5, 5],
-          tension: 0.3
+          tension: 0.3,
+          fill: false
         }
       ]
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
       scales: {
         x: {
           ticks: {
             maxRotation: 45,
             autoSkip: true
-          }
+          },
+          type: 'category',
+        },
+        y: {
+          beginAtZero: false
         }
       },
       plugins: {
@@ -92,6 +99,16 @@ function displayPredictionChart(dates, prices, predictedTimes = [], predictedPri
           mode: 'index',
           intersect: false
         }
+      },
+      zoom: {
+        enabled: true,
+        mode: 'xy',
+        speed: 0.1
+      },
+      pan: {
+        enabled: true,
+        mode: 'xy',
+        speed: 10
       }
     }
   });
