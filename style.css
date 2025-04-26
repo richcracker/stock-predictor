@@ -1,4 +1,4 @@
-/* Global reset */
+/* Global Reset */
 body, h1, p, form, input, button, canvas {
   margin: 0;
   padding: 0;
@@ -15,15 +15,20 @@ body {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
+  box-sizing: border-box;
 }
 
-h1 {
-  font-size: 2.5rem;
+header {
   text-align: center;
   margin-bottom: 20px;
 }
 
-form {
+h1 {
+  font-size: 2.5rem;
+  color: #4CAF50;
+}
+
+#stock-form {
   display: flex;
   justify-content: center;
   margin-bottom: 20px;
@@ -83,4 +88,8 @@ canvas {
 
 #nextDayButton:hover {
   background-color: #0056b3;
+}
+
+section#prediction-section {
+  text-align: center;
 }
