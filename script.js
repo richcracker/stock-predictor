@@ -1,15 +1,3 @@
-// Event listener for the "Let's Start Predicting" button
-document.getElementById('start-predicting-button').addEventListener('click', function(event) {
-  console.log('Button clicked!');  // For debugging
-  event.preventDefault();  // Prevent default button behavior
-  
-  // Hide homepage content
-  document.getElementById('homepage-content').style.display = 'none';
-  
-  // Show prediction form
-  document.getElementById('prediction-form-container').style.display = 'block';
-});
-
 // Fetch stock data from Finnhub and Twelve Data APIs
 async function fetchStockData(symbol) {
   const finnhubAPI = 'd00h83pr01qk939o3nn0d00h83pr01qk939o3nng';  // Replace with your Finnhub API key
@@ -151,23 +139,44 @@ async function getStockData(event) {
   try {
     // Fetch initial stock data
     const { finnhubData, twelveData } = await fetchStockData(symbol);
-    const prices = twelveData.values.map(entry => parseFloat(entry.close));
-    const times = twelveData.values.map(entry => new Date(entry.datetime).toLocaleTimeString());
+    const prices = twelveData.values
+    const prices = twelveData.values.map(item => parseFloat(item.close));
+    const dates = twelveData.values.map(item => item.datetime);
 
-    // Fetch predictions
-    const predictions = await fetchPredictions(symbol);
-    const predictedPrices = predictions;  // Use the actual prediction model's output here
-    const predictedTimes = generatePredictedDates(times[times.length - 1]);  // Generate future times for predictions
+    // Fetch prediction data
+    const predictionData = await fetchPredictions(symbol);
+    const predictedPrices = predictionData.map(item => parseFloat(item.predictedPrice));
+    const predictedTimes = generatePredictedDates(dates[dates.length - 1]);
 
-    // Display the prediction chart
-    displayPredictionChart(times, prices, predictedTimes, predictedPrices);
+    // Hide the loading spinner
+    document.getElementById('loading-spinner').style.display = 'none';
 
-    // Generate buy/sell signal and best time to buy
-    const recommendation = generateBuySellSignal(predictedPrices[0], finnhubData.c);
+    // Display prediction chart
+    displayPredictionChart(dates, prices, predictedTimes, predictedPrices, true);
+
+    // Generate buy/sell recommendation based on the predicted price
+    const buySellRecommendation = generateBuySellSignal(predictedPrices[0], prices[prices.length - 1]);
+    document.getElementById('buySellRecommendation').innerText = `Recommendation: ${buySellRecommendation}`;
+
+    // Get the best time to buy
     const bestTimeToBuy = getBestTimeToBuy(predictedPrices, predictedTimes);
+    document.getElementById('buyAmountRecommendation').innerText = `Best time to buy: ${bestTimeToBuy}`;
 
-    // Display recommendation and best time to buy
-    document.getElementById('buySellRecommendation').innerHTML = `
-      <p><strong>Recommendation: </strong>${recommendation}</p>
-      <p><strong>Current Price: </strong>$${finnhubData.c}</p>
-      <p
+    // Show the prediction results section
+    document.getElementById('prediction-results').style.display = 'block';
+
+    // Add event listener to the Next Day button (if displayed)
+    document.getElementById('nextDayButton').addEventListener('click', function() {
+      // Display the prediction for the next trading day
+      const nextPredictedPrice = predictedPrices[1] || "No data available";
+      alert(`Next predicted price: $${nextPredictedPrice}`);
+    });
+  } catch (error) {
+    // Hide the loading spinner
+    document.getElementById('loading-spinner').style.display = 'none';
+    alert("An error occurred while fetching data. Please try again.");
+  }
+}
+
+// Add event listener to the form submit button
+document.getElementById('stock-form').addEventListener('submit', getStockData);
