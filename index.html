@@ -3,33 +3,45 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Stock Market Prediction Engine</title>
-  <link rel="stylesheet" href="styles.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <title>Stock Prediction</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>Stock Market Prediction Engine</h1>
-    </header>
+  <header>
+    <h1>Stock Market Prediction Engine</h1>
+  </header>
 
-    <section id="prediction-section">
+  <main>
+    <section class="form-container">
+      <h2>Enter Stock Symbol</h2>
       <form id="stock-form">
-        <input type="text" id="stock-symbol" placeholder="Enter stock symbol (e.g., AAPL)" required />
+        <input type="text" id="stock-symbol" placeholder="Enter symbol (e.g., AAPL)" required>
         <button type="submit">Get Prediction</button>
       </form>
-      <div id="loading-spinner" style="display: none;">Loading...</div>
-      
-      <div id="prediction-results" style="display: none;">
-        <h2>Prediction Results</h2>
-        <div id="buySellRecommendation"></div>
-        <div id="buyAmountRecommendation"></div>
-        <canvas id="predictionChart"></canvas>
-        <button id="nextDayButton" style="display: none;">Next Day Predictions</button>
-      </div>
     </section>
-  </div>
+    <!-- Spinner -->
+    <div id="loading-spinner" style="display: none;">
+      <div class="spinner"></div>
+      <p>Loading prediction...</p>
+    </div>
 
+    <section id="prediction-results" style="display: none;">
+      <h3>Prediction Results</h3>
+      <div id="chart-container">
+        <canvas id="predictionChart"></canvas>
+      </div>
+      <div id="buySellRecommendation" style="margin-top: 20px;"></div>
+      <div id="buyAmountRecommendation" style="margin-top: 10px;"></div>
+      <!-- Next Day Button for navigating to the next prediction -->
+      <button id="nextDayButton" style="display: none;">Next Day</button>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 StockPredictor Logan Hines</p>
+  </footer>
+  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
