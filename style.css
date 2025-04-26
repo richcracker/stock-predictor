@@ -1,4 +1,5 @@
-body, h1, p, form, input, button {
+/* Global reset */
+body, h1, p, form, input, button, canvas {
   margin: 0;
   padding: 0;
   font-family: 'Roboto', sans-serif;
@@ -32,7 +33,7 @@ input {
   padding: 10px;
   font-size: 1rem;
   margin-right: 10px;
-  width: 200px;
+  width: 250px;
   border-radius: 5px;
   border: 1px solid #ccc;
 }
@@ -53,6 +54,7 @@ button:hover {
 
 #loading-spinner {
   text-align: center;
+  font-size: 1.2rem;
 }
 
 #prediction-results {
