@@ -1,177 +1,88 @@
-/* General Styles */
-* {
+/* Reset some default styling */
+body, h1, p, form, input, button {
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
 }
 
+/* Basic styling */
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f9;
+  background-color: #f4f7fa;
   color: #333;
-  line-height: 1.6;
+  font-size: 16px;
+  line-height: 1.5;
 }
 
-header {
-  background-color: #333;
-  color: #fff;
-  text-align: center;
-  padding: 20px 0;
-}
-
-header h1 {
-  font-size: 2.5rem;
-  margin-bottom: 5px;
-}
-
-header .subtext {
-  font-size: 1rem;
-  color: #bbb;
-}
-
-main {
-  padding: 20px;
-  max-width: 800px;
+.container {
+  max-width: 1200px;
   margin: 0 auto;
-}
-
-.form-container {
-  background-color: #fff;
   padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  margin-top: 20px;
 }
 
-.form-container h2 {
-  margin-bottom: 20px;
-  font-size: 1.8rem;
+h1 {
+  font-size: 2.5rem;
   text-align: center;
+  margin-bottom: 20px;
 }
 
-#stock-form {
+form {
   display: flex;
   justify-content: center;
-  flex-wrap: wrap;
+  margin-bottom: 20px;
 }
 
-#stock-symbol {
+input {
   padding: 10px;
   font-size: 1rem;
   margin-right: 10px;
-  width: 220px;
-  max-width: 100%;
+  width: 200px;
   border-radius: 5px;
   border: 1px solid #ccc;
 }
 
 button {
-  padding: 10px 20px;
-  background-color: #333;
-  color: #fff;
+  padding: 10px 15px;
+  font-size: 1rem;
+  cursor: pointer;
+  background-color: #4CAF50;
+  color: white;
   border: none;
   border-radius: 5px;
-  cursor: pointer;
-  font-size: 1rem;
 }
 
 button:hover {
-  background-color: #555;
+  background-color: #45a049;
+}
+
+#loading-spinner {
+  text-align: center;
 }
 
 #prediction-results {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  margin-top: 30px;
+  display: none;
 }
 
-#prediction-results h3 {
-  font-size: 1.8rem;
-  margin-bottom: 20px;
-  text-align: center;
+canvas {
+  width: 100%;
+  height: 400px;
 }
 
-#buySellRecommendation, 
-#buyAmountRecommendation {
+#buySellRecommendation, #buyAmountRecommendation {
   margin-top: 20px;
   font-size: 1.2rem;
-  text-align: center;
-}
-
-.recommendation {
   font-weight: bold;
 }
 
-footer {
-  text-align: center;
-  margin-top: 40px;
-  font-size: 1rem;
-  color: #888;
-}
-
-footer p {
-  margin: 20px 0;
-}
-
 #nextDayButton {
-  margin: 20px auto 0 auto;
-  display: block;
-  padding: 10px 20px;
-  background-color: #333;
-  color: #fff;
+  padding: 10px;
+  background-color: #007BFF;
+  color: white;
   border: none;
   border-radius: 5px;
-  cursor: pointer;
-  font-size: 1rem;
-}
-
-#nextDayButton:hover {
-  background-color: #555;
-}
-
-#chart-container {
   margin-top: 20px;
 }
 
-#predictionChart {
-  width: 100%;
-  max-width: 100%;
+#nextDayButton:hover {
+  background-color: #0056b3;
 }
 
-/* Spinner Styles */
-#loading-spinner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 9999;
-  background-color: rgba(0, 0, 0, 0.5);
-  width: 100%;
-  height: 100%;
-}
-
-.spinner {
-  border: 8px solid #f3f3f3;
-  border-top: 8px solid #333;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  animation: spin 2s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-#loading-spinner p {
-  color: #fff;
-  margin-top: 10px;
-  font-size: 1.2rem;
-}
