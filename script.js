@@ -178,7 +178,11 @@ async function getStockData(event) {
     document.getElementById('loading-spinner').style.display = 'none';
   }
 }
-
-
 // Event listener for form submission
 document.getElementById('stock-form').addEventListener('submit', getStockData);
+
+// Scroll to the prediction form section when the button is clicked
+function scrollToPredictionSection() {
+  const predictionSection = document.getElementById('prediction-section');
+  predictionSection.scrollIntoView({ behavior: 'smooth' });
+}
