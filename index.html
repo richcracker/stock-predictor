@@ -4,34 +4,33 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Stock Market Prediction Engine</title>
-  <link rel="stylesheet" href="styles.css"> <!-- Link to external CSS -->
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="container">
-    <h1>Stock Market Prediction Engine</h1>
-
-    <!-- Form to enter stock symbol -->
-    <form id="stock-form">
-      <input type="text" id="stock-symbol" placeholder="Enter stock symbol" required>
-      <button type="submit">Get Stock Prediction</button>
-    </form>
-
-    <!-- Loading spinner (hidden by default) -->
-    <div id="loading-spinner" style="display:none;">
-      <p>Loading...</p>
-    </div>
-
-    <!-- Prediction results (hidden by default) -->
-    <div id="prediction-results" style="display:none;">
-      <canvas id="predictionChart"></canvas>
+    <header>
+      <h1>Stock Market Prediction Engine</h1>
+    </header>
+    
+    <section id="prediction-section">
+      <form id="stock-form">
+        <input type="text" id="stock-symbol" placeholder="Enter stock symbol (e.g., AAPL)" required />
+        <button type="submit">Get Prediction</button>
+      </form>
       
-      <div id="buySellRecommendation"></div>
-      <div id="buyAmountRecommendation"></div>
-      <button id="nextDayButton" style="display:none;">Next Trading Day Prediction</button>
-    </div>
+      <div id="loading-spinner" style="display: none;">Loading...</div>
+      
+      <div id="prediction-results" style="display: none;">
+        <h2>Prediction Results</h2>
+        <div id="buySellRecommendation"></div>
+        <div id="buyAmountRecommendation"></div>
+        <canvas id="predictionChart"></canvas>
+        <button id="nextDayButton" style="display: none;">Next Day Predictions</button>
+      </div>
+    </section>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="script.js"></script> <!-- Link to external JS -->
+  <script src="script.js"></script>
 </body>
 </html>
