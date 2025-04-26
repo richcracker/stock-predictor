@@ -1,118 +1,156 @@
-/* Global Reset */
-body, h1, p, form, input, button, canvas {
+/* General Styles */
+* {
   margin: 0;
   padding: 0;
-  font-family: 'Roboto', sans-serif;
+  box-sizing: border-box;
 }
 
 body {
-  background-color: #f4f7fa;
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f9;
   color: #333;
-  font-size: 16px;
-}
-
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-  box-sizing: border-box;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  line-height: 1.6;
 }
 
 header {
+  background-color: #333;
+  color: #fff;
   text-align: center;
-  margin-bottom: 20px;
+  padding: 20px 0;
 }
 
-h1 {
+header h1 {
   font-size: 2.5rem;
-  color: #4CAF50;
+}
+
+main {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.form-container {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-container h2 {
+  margin-bottom: 20px;
+  font-size: 1.8rem;
+  text-align: center;
 }
 
 #stock-form {
   display: flex;
   justify-content: center;
-  margin-bottom: 20px;
 }
 
-input {
-  padding: 12px;
+#stock-symbol {
+  padding: 10px;
   font-size: 1rem;
   margin-right: 10px;
-  width: 250px;
+  width: 200px;
   border-radius: 5px;
   border: 1px solid #ccc;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 button {
-  padding: 12px 20px;
-  font-size: 1rem;
-  cursor: pointer;
-  background-color: #4CAF50;
-  color: white;
+  padding: 10px 20px;
+  background-color: #333;
+  color: #fff;
   border: none;
   border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
 }
 
 button:hover {
-  background-color: #45a049;
-}
-
-#loading-spinner {
-  text-align: center;
-  font-size: 1.2rem;
-  font-weight: bold;
+  background-color: #555;
 }
 
 #prediction-results {
-  display: none;
-  text-align: center;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  margin-top: 30px;
 }
 
-canvas {
-  width: 100%;
-  height: 400px;
+#prediction-results h3 {
+  font-size: 1.8rem;
+  margin-bottom: 20px;
 }
 
 #buySellRecommendation, #buyAmountRecommendation {
   margin-top: 20px;
   font-size: 1.2rem;
-  font-weight: bold;
+}
+
+footer {
+  text-align: center;
+  margin-top: 30px;
+  font-size: 1rem;
+  color: #888;
+}
+
+footer p {
+  margin: 20px 0;
 }
 
 #nextDayButton {
-  padding: 10px;
-  background-color: #007BFF;
-  color: white;
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #333;
+  color: #fff;
   border: none;
   border-radius: 5px;
-  margin-top: 20px;
   cursor: pointer;
+  font-size: 1rem;
+  display: inline-block;
 }
 
 #nextDayButton:hover {
-  background-color: #0056b3;
+  background-color: #555;
 }
 
-section#prediction-section {
-  text-align: center;
+#predictionChart {
+  margin-top: 20px;
+  width: 100%;
+  max-width: 100%;
+}
+/* Spinner Styles */
+#loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  background-color: rgba(0, 0, 0, 0.5);
+  width: 100%;
+  height: 100%;
 }
 
-@media (max-width: 768px) {
-  .container {
-    padding: 10px;
-  }
+.spinner {
+  border: 8px solid #f3f3f3;
+  border-top: 8px solid #333;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 2s linear infinite;
+}
 
-  input, button {
-    width: 100%;
-    font-size: 1.1rem;
-  }
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 
-  h1 {
-    font-size: 2rem;
-  }
+#loading-spinner p {
+  color: #fff;
+  margin-top: 10px;
+  font-size: 1.2rem;
 }
