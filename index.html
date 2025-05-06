@@ -19,6 +19,7 @@
         <button type="submit">Get Prediction</button>
       </form>
     </section>
+
     <!-- Spinner -->
     <div id="loading-spinner" style="display: none;">
       <div class="spinner"></div>
@@ -27,11 +28,32 @@
 
     <section id="prediction-results" style="display: none;">
       <h3>Prediction Results</h3>
-      <div id="chart-container">
+
+      <!-- New Chart Controls -->
+      <div class="chart-controls" style="margin: 20px 0;">
+        <button id="toggle-chart-type" title="Switch between line and candlestick view">Toggle Chart Type</button>
+        <button id="fullscreen-btn" title="Go fullscreen to zoom">Fullscreen</button>
+        <label for="start-date">Start:</label>
+        <input type="date" id="start-date" />
+        <label for="end-date">End:</label>
+        <input type="date" id="end-date" />
+      </div>
+
+      <!-- Chart Canvas Container -->
+      <div id="chart-wrapper" style="position: relative; width: 100%; max-width: 1000px; margin: 0 auto;">
+        <canvas id="stockChart" style="width: 100%; height: 500px;"></canvas>
+      </div>
+
+      <div id="chart-hover-info" style="text-align: center; margin-top: 10px;"></div>
+
+      <!-- Original prediction chart (optional: may be replaced if you're going fully candlestick/line) -->
+      <div id="chart-container" style="margin-top: 30px;">
         <canvas id="predictionChart"></canvas>
       </div>
+
       <div id="buySellRecommendation" style="margin-top: 20px;"></div>
       <div id="buyAmountRecommendation" style="margin-top: 10px;"></div>
+
       <!-- Next Day Button for navigating to the next prediction -->
       <button id="nextDayButton" style="display: none;">Next Day</button>
     </section>
